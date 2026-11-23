@@ -1,624 +1,923 @@
-
 <!DOCTYPE html>
+
 <html lang="zh-CN">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ARTIST AI 4.0 | 角色绘画学院</title>
+
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
+<meta name="theme-color" content="#f7f5f0">
+
+<title>ARTIST AI · 数字艺术学院</title>
+
 <style>
-:root {
-  --bg:#f7f5f2; --card:#fff; --ink:#302d32;
-  --muted:#88818a; --purple:#8068a5; --soft:#eee8f5;
-  --line:#ebe6ed; --green:#658b75; --pink:#f5e9ec;
-}
+
+:root{--bg:#f7f5f0;--paper:#fffefa;--ink:#292a30;--muted:#898993;--line:#e9e6df;--purple:#8175a8;--pale:#efebf6;--green:#758d7a;--gold:#c29b66;--shadow:0 8px 30px #39302a0a}
+
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);
-font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif}
-header{padding:30px 22px;background:linear-gradient(130deg,#eae3f2,#f5e9e9)}
-header small{color:var(--purple);letter-spacing:2px;font-weight:bold}
-header h1{font-size:29px;margin:12px 0 7px}
-header p{color:#77717b;line-height:1.7;margin:0}
-nav{display:flex;overflow-x:auto;gap:7px;padding:12px;
-background:white;position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line)}
-nav button{white-space:nowrap;border:0;background:#f3f0f5;color:#655c6d;
-padding:11px 14px;border-radius:20px}
-nav button.active{background:var(--purple);color:white}
-main{max-width:950px;margin:auto;padding:17px}
+
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.75}
+
+button,input,textarea,select{font:inherit}
+
+button{cursor:pointer}
+
+.app{max-width:1440px;margin:auto;min-height:100vh}
+
+header{height:76px;background:#fffefaed;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 5%;position:sticky;top:0;z-index:10;backdrop-filter:blur(16px)}
+
+.logo{font-family:Georgia,serif;font-size:22px;letter-spacing:2px;font-weight:600}
+
+.logo small{display:block;font-family:inherit;font-size:9px;letter-spacing:4px;color:var(--muted);font-weight:400}
+
+.header-right{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px}
+
+.layout{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:calc(100vh - 76px)}
+
+aside{padding:30px 18px;border-right:1px solid var(--line);background:#faf9f5}
+
+.nav-label{font-size:10px;letter-spacing:2px;color:#aaa5a0;margin:22px 12px 8px}
+
+.nav{width:100%;border:0;background:transparent;text-align:left;padding:12px;border-radius:10px;color:#77747c;margin:2px 0}
+
+.nav.active,.nav:hover{background:var(--pale);color:#5c527a}
+
+.nav span{display:inline-block;width:27px}
+
+main{padding:36px clamp(18px,4vw,58px);min-width:0}
+
 .page{display:none}.page.active{display:block}
-.card{background:var(--card);border:1px solid var(--line);
-border-radius:17px;padding:18px;margin-bottom:14px}
-h2{font-size:20px;margin:0 0 13px}
-h3{font-size:16px;margin:0 0 9px}
-p{line-height:1.65}
-.muted{color:var(--muted);font-size:13px;line-height:1.7}
-button,.btn{cursor:pointer;border:0;border-radius:11px;
-padding:11px 15px;background:var(--purple);color:white;font-weight:600}
-button:disabled{opacity:.5;cursor:not-allowed}
-.secondary{background:var(--soft);color:#655477}
-.danger{background:#f7e9e9;color:#a45b5b}
-input,textarea,select{width:100%;padding:12px;margin:6px 0 12px;
-border:1px solid var(--line);border-radius:10px;background:white;
-font:inherit;color:var(--ink)}
-textarea{min-height:100px;resize:vertical}
-label{font-size:13px;color:#77717b}
-.row{display:flex;gap:12px;flex-wrap:wrap}
-.row>*{flex:1;min-width:120px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.stat{background:#f7f3fa;border-radius:13px;padding:14px}
-.stat b{font-size:25px;display:block}
-.stat span{font-size:12px;color:var(--muted)}
-.progress{height:8px;background:#eee9ef;border-radius:20px;overflow:hidden}
-.progress span{display:block;height:100%;background:var(--green)}
-.item{padding:13px 0;border-bottom:1px solid var(--line)}
-.item:last-child{border:0}
-.tag{display:inline-block;background:var(--soft);color:#6b5684;
-border-radius:20px;padding:4px 9px;font-size:11px;margin:3px}
-.task{display:flex;gap:10px;align-items:flex-start;padding:10px 0;
-border-bottom:1px solid var(--line)}
-.task input{width:auto;margin-top:5px}
-.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:12px}
-.work{border:1px solid var(--line);border-radius:12px;padding:9px}
-.work img{width:100%;height:135px;object-fit:cover;border-radius:8px}
-.preview{max-width:100%;max-height:280px;object-fit:contain}
-.chat{height:300px;overflow:auto;background:#faf8fa;padding:12px;border-radius:12px;margin:10px 0}
-.bubble{padding:11px;border-radius:12px;margin:8px 0;white-space:pre-wrap;line-height:1.6}
-.me{background:var(--soft);margin-left:20px}
-.bot{background:white;border:1px solid var(--line);margin-right:20px}
-footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
-@media(max-width:500px){.stats{gap:6px}.stat{padding:10px}.stat b{font-size:21px}}
+
+.eyebrow{color:var(--purple);letter-spacing:2px;font-size:11px;font-weight:600}
+
+h1{font-size:clamp(27px,4vw,40px);font-weight:500;line-height:1.3;margin:8px 0 12px;letter-spacing:-1px}
+
+h2{font-size:22px;font-weight:550;margin:0 0 15px}
+
+h3{font-size:16px;font-weight:600;margin:0 0 9px}
+
+p{margin:7px 0;color:#696873}
+
+.muted{color:var(--muted);font-size:12px}
+
+.hero{background:linear-gradient(120deg,#eeebf4,#f8f4ec 70%,#e9eee8);border-radius:20px;padding:clamp(24px,4vw,48px);position:relative;overflow:hidden;margin-bottom:24px}
+
+.hero:after{content:"ART";font-family:Georgia,serif;font-size:130px;position:absolute;right:25px;bottom:-40px;color:#ffffff70}
+
+.hero p{max-width:520px;color:#66616c}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0 30px}
+
+.stat,.card{background:var(--paper);border:1px solid var(--line);border-radius:15px;padding:18px;box-shadow:var(--shadow)}
+
+.stat strong{font-family:Georgia,serif;font-size:28px;display:block;font-weight:500}
+
+.stat span{font-size:11px;color:var(--muted)}
+
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:28px 0 14px}
+
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+
+.course-card{background:var(--paper);border:1px solid var(--line);padding:18px;border-radius:15px;cursor:pointer;transition:.2s}
+
+.course-card:hover{transform:translateY(-2px);border-color:#c6bbd8}
+
+.course-card h3{margin:8px 0}
+
+.tag{display:inline-block;background:var(--pale);color:#6c6088;border-radius:30px;padding:3px 9px;font-size:10px;margin:2px}
+
+.btn{border:0;background:var(--purple);color:white;padding:11px 18px;border-radius:9px;font-weight:550}
+
+.btn.secondary{background:#eeeaf4;color:#62577c}
+
+.btn.light{background:#f2f0eb;color:#5f5c62}
+
+.btn.danger{background:#f5e9e7;color:#a25c55}
+
+.btn.small{padding:7px 11px;font-size:12px}
+
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
+
+.progress{height:7px;border-radius:20px;background:#eeece7;overflow:hidden;margin:12px 0}
+
+.progress i{display:block;height:100%;background:var(--purple);border-radius:20px}
+
+.lesson-layout{display:grid;grid-template-columns:minmax(0,1fr) 245px;gap:20px;align-items:start}
+
+.lesson-main{min-width:0}
+
+.lesson-side{position:sticky;top:95px}
+
+.lesson-block{background:var(--paper);border:1px solid var(--line);padding:22px;border-radius:15px;margin:14px 0}
+
+.lesson-block h3{color:#5e5477}
+
+.step{display:flex;gap:12px;margin:17px 0;align-items:flex-start}
+
+.step-no{flex:none;width:27px;height:27px;border-radius:50%;background:var(--pale);color:#665a82;text-align:center;line-height:27px;font-size:12px}
+
+.diagram{background:#f4f1eb;border-radius:13px;padding:15px;margin:14px 0;text-align:center}
+
+.diagram svg{width:100%;max-width:500px;height:auto;display:block;margin:auto}
+
+.diagram-caption{font-size:11px;color:#85818a;margin-top:7px}
+
+.note{background:#f2f0f6;border-left:3px solid var(--purple);padding:12px 15px;border-radius:4px;margin:12px 0;color:#615b6e}
+
+.warning{background:#faf2e7;border-left:3px solid var(--gold);padding:12px 15px;border-radius:4px;margin:12px 0;color:#766348}
+
+.lesson-side .card{margin-bottom:12px}
+
+.check{display:flex;gap:9px;align-items:flex-start;margin:9px 0}
+
+.check input{margin-top:5px;accent-color:var(--purple)}
+
+input[type=text],input[type=number],textarea,select{width:100%;border:1px solid var(--line);border-radius:9px;background:#fff;padding:11px;color:var(--ink);outline:none}
+
+textarea{min-height:95px;resize:vertical}
+
+label{display:block;font-size:12px;color:#6e6b73;margin:12px 0 5px}
+
+table{width:100%;border-collapse:collapse;font-size:12px}
+
+td,th{padding:10px 7px;border-bottom:1px solid var(--line);text-align:left}
+
+th{color:var(--muted);font-weight:500}
+
+.score-input{max-width:75px}
+
+.upload{border:1px dashed #c8c0d5;border-radius:12px;padding:20px;text-align:center;background:#faf9fc}
+
+.art-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+
+.art{background:white;border:1px solid var(--line);border-radius:12px;padding:10px}
+
+.art img{width:100%;aspect-ratio:1;object-fit:contain;background:#f3f1ed;border-radius:7px}
+
+.art strong{display:block;margin-top:7px;font-size:12px}
+
+.empty{padding:35px;text-align:center;background:#fffefa;border:1px dashed var(--line);border-radius:14px;color:var(--muted)}
+
+hr{border:0;border-top:1px solid var(--line);margin:20px 0}
+
+.reference{font-size:12px;padding:12px;background:#f7f5f0;border-radius:10px;margin:8px 0}
+
+.reference a{color:#71638e}
+
+.mobile-nav{display:none}
+
+footer{text-align:center;padding:30px;color:#aaa;font-size:11px}
+
+@media(max-width:800px){
+
+ .layout{grid-template-columns:1fr}
+
+ aside{display:none}
+
+ header{height:64px;padding:0 16px}
+
+ main{padding:24px 15px 90px}
+
+ .mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fffefaed;border-top:1px solid var(--line);z-index:20;justify-content:space-around;padding:7px 3px calc(7px + env(safe-area-inset-bottom));backdrop-filter:blur(15px)}
+
+ .mobile-nav button{border:0;background:transparent;color:#817d85;font-size:10px;padding:5px}
+
+ .mobile-nav button.active{color:var(--purple)}
+
+ .mobile-nav span{display:block;font-size:18px}
+
+ .lesson-layout{grid-template-columns:1fr}
+
+ .lesson-side{position:static}
+
+ .stats{grid-template-columns:repeat(2,1fr)}
+
+ .grid{grid-template-columns:1fr}
+
+ .art-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+
+ .hero:after{font-size:90px}
+
+}
+
 </style>
+
 </head>
 
 <body>
 
+<div class="app">
+
 <header>
-<small>ARTIST AI · CHARACTER ART ACADEMY</small>
-<h1>成为你想成为的角色画师。</h1>
-<p>24周系统学习 · 男女角色 · 多种绘画风格<br>
-从临摹入门，到独立设计自己的角色。</p>
+
+ <div class="logo">ARTIST AI<small>DIGITAL ART ACADEMY</small></div>
+
+ <div class="header-right"><span id="today"></span><span>✦ 学习空间</span></div>
+
 </header>
 
-<nav id="nav">
-<button class="active" data-page="home">首页</button>
-<button data-page="course">课程中心</button>
-<button data-page="practice">智能练习</button>
-<button data-page="mentor">AI导师</button>
-<button data-page="portfolio">作品档案</button>
-<button data-page="compare">作品对比</button>
-<button data-page="memory">学习记忆</button>
-<button data-page="settings">数据设置</button>
-</nav>
+<div class="layout">
+
+<aside>
+
+ <div class="nav-label">学习空间</div>
+
+ <button class="nav active" data-page="home"> <span>⌂</span>学习首页</button>
+
+ <button class="nav" data-page="courses"><span>▤</span>系统课程</button>
+
+ <button class="nav" data-page="classroom"><span>✎</span>今日课堂</button>
+
+ <div class="nav-label">练习与成长</div>
+
+ <button class="nav" data-page="homework"><span>▧</span>作业与批改</button>
+
+ <button class="nav" data-page="portfolio"><span>▣</span>作品档案</button>
+
+ <button class="nav" data-page="records"><span>◷</span>学习记录</button>
+
+ <button class="nav" data-page="references"><span>⌕</span>教学资料</button>
+
+ <div class="nav-label">系统</div>
+
+ <button class="nav" data-page="settings"><span>⚙</span>数据管理</button>
+
+</aside>
 
 <main>
 
-<!-- 首页 -->
 <section class="page active" id="home">
-<div class="card">
-<h2>欢迎回来 ✨</h2>
-<p class="muted" id="date"></p>
-<h3 id="todayTask">今日人物绘画训练</h3>
-<p class="muted">每天建议学习3小时：基础训练60分钟、专项练习60分钟、独立创作60分钟。</p>
-<div class="progress"><span id="progress" style="width:0%"></span></div>
-<p class="muted" id="progressText">开始今天的训练吧。</p>
-<button id="checkin">完成今日打卡</button>
-</div>
 
-<div class="stats">
-<div class="stat"><b id="days">0</b><span>累计打卡</span></div>
-<div class="stat"><b id="works">0</b><span>作品数量</span></div>
-<div class="stat"><b id="level">1</b><span>训练等级</span></div>
-</div>
+ <div class="hero">
 
-<div class="card">
-<h2>本周学习内容</h2>
-<h3 id="weekTitle"></h3>
-<p class="muted" id="weekDescription"></p>
-</div>
+  <div class="eyebrow">WELCOME TO YOUR ART JOURNEY</div>
 
-<div class="card">
-<h2>你的学习方向</h2>
-<span class="tag">男性角色</span>
-<span class="tag">女性角色</span>
-<span class="tag">动漫</span>
-<span class="tag">韩系</span>
-<span class="tag">半写实</span>
-<span class="tag">欧美</span>
-<p class="muted">男女角色均衡训练，不局限于一种风格。</p>
-</div>
+  <h1>让每一笔，<br>都有清晰的方向。</h1>
+
+  <p>从基础观察、人体结构到原创角色设计。不是只看教程，而是理解原理、亲手练习、接受反馈，逐步建立自己的绘画能力。</p>
+
+  <div class="actions"><button class="btn" onclick="go('classroom')">进入今日课堂 →</button><button class="btn secondary" onclick="go('courses')">查看完整课程</button></div>
+
+ </div>
+
+ <div class="stats">
+
+  <div class="stat"><strong id="statDone">0</strong><span>已完成课程</span></div>
+
+  <div class="stat"><strong id="statWorks">0</strong><span>作品档案</span></div>
+
+  <div class="stat"><strong id="statDays">0</strong><span>学习打卡天数</span></div>
+
+  <div class="stat"><strong>24</strong><span>课程总周数</span></div>
+
+ </div>
+
+ <div class="section-head"><h2>继续你的学习</h2><span class="muted">从当前进度出发</span></div>
+
+ <div class="card">
+
+  <div class="eyebrow">YOUR LEARNING PATH</div>
+
+  <h3 id="currentTitle">第一周 · 线条与观察</h3>
+
+  <p id="currentDesc">建立对线条、方向、长度和形状的控制。</p>
+
+  <div class="progress"><i id="overallProgress" style="width:0%"></i></div>
+
+  <p class="muted" id="progressText">已完成 0 / 24 周</p>
+
+  <button class="btn small" onclick="go('classroom')">继续学习</button>
+
+ </div>
+
+ <div class="section-head"><h2>六个学习阶段</h2></div>
+
+ <div class="grid" id="phaseCards"></div>
+
 </section>
 
-<!-- 课程 -->
-<section class="page" id="course">
-<div class="card">
-<h2>24周完整课程</h2>
-<p class="muted">从基础造型到独立角色创作。</p>
-<div id="courses"></div>
-</div>
+<section class="page" id="courses">
+
+ <div class="eyebrow">CURRICULUM</div><h1>系统课程</h1>
+
+ <p>24 周循序渐进。每个阶段都需要完成练习和阶段测试，不以看完课程代替真正掌握。</p>
+
+ <div class="section-head"><h2>课程路线图</h2><span class="muted">共 6 个阶段 · 24 周</span></div>
+
+ <div id="courseList"></div>
+
 </section>
 
-<!-- 练习 -->
-<section class="page" id="practice">
-<div class="card">
-<h2>智能练习生成器</h2>
+<section class="page" id="classroom">
 
-<label>训练角色</label>
-<select id="gender">
-<option>女性角色</option>
-<option>男性角色</option>
-<option>男女各一张</option>
-</select>
+ <div class="eyebrow">LESSON ROOM</div><h1>今日课堂</h1>
 
-<label>绘画风格</label>
-<select id="style">
-<option>动漫</option>
-<option>韩系</option>
-<option>半写实</option>
-<option>欧美</option>
-<option>自由混合</option>
-</select>
+ <p>先理解原理，再看示范，最后动手练习。</p>
 
-<label>训练主题</label>
-<select id="topic">
-<option>头部与五官</option>
-<option>人体动态</option>
-<option>手部结构</option>
-<option>服装褶皱</option>
-<option>发型设计</option>
-<option>全身角色</option>
-<option>人物表情</option>
-<option>原创角色设计</option>
-</select>
+ <div class="lesson-layout">
 
-<label>训练难度</label>
-<select id="difficulty">
-<option value="1">基础</option>
-<option value="2">进阶</option>
-<option value="3">挑战</option>
-</select>
+  <div class="lesson-main" id="lessonContent"></div>
 
-<button id="generate">生成我的练习</button>
-<div id="exercise" class="item"></div>
-</div>
+  <div class="lesson-side">
 
-<div class="card">
-<h2>角色参考观察题库</h2>
-<p class="muted">抽取一个具体观察任务，练习从参考图中理解人物结构。</p>
-<button class="secondary" id="randomQuestion">随机抽取练习题</button>
-<div id="question" class="item"></div>
-</div>
+   <div class="card">
+
+    <h3>课程导航</h3>
+
+    <label>选择课程</label>
+
+    <select id="lessonSelect" onchange="selectLesson(this.value)"></select>
+
+    <hr>
+
+    <div class="muted">本节学习目标</div>
+
+    <p id="lessonGoal">理解线条控制。</p>
+
+    <div class="progress"><i id="lessonProgress" style="width:0%"></i></div>
+
+    <p class="muted" id="lessonStatus">尚未完成</p>
+
+   </div>
+
+   <div class="card">
+
+    <h3>课堂提醒</h3>
+
+    <p>不要急着追求画得漂亮。先把结构和观察方法理解清楚。</p>
+
+    <p class="muted">建议：每天 3 小时，分段练习，中间休息。</p>
+
+   </div>
+
+  </div>
+
+ </div>
+
 </section>
 
-<!-- AI导师 -->
-<section class="page" id="mentor">
-<div class="card">
-<h2>AI绘画导师</h2>
-<p class="muted">真正的AI对话需要配置后端服务。目前这里不会用预设答案冒充AI。</p>
-<div id="aiStatus" class="tag">尚未连接AI服务</div>
-<div class="chat" id="chat">
-<div class="bubble bot">你好！我是你的角色绘画导师。你可以在这里记录想问的问题。连接AI后端后即可进行真正的智能对话。</div>
-</div>
-<textarea id="questionInput" placeholder="例如：为什么我画的头部总是不自然？"></textarea>
-<button id="sendQuestion">发送问题</button>
-</div>
+<section class="page" id="homework">
 
-<div class="card">
-<h2>上传作品进行视觉分析</h2>
-<p class="muted">连接支持图片输入的AI后端后，才能真正识别和分析作品。</p>
-<input type="file" id="analysisFile" accept="image/*">
-<img id="analysisPreview" class="preview" hidden>
-<textarea id="analysisPrompt" placeholder="你希望重点分析什么？例如头部比例、人体结构、动态……"></textarea>
-<button id="analyze">请求视觉分析</button>
-<div id="analysisResult" class="muted"></div>
-</div>
+ <div class="eyebrow">ASSIGNMENTS & REVIEW</div><h1>作业与批改</h1>
+
+ <p>上传作业，依据评分量表进行自查，并记录老师或导师给出的具体反馈。</p>
+
+ <div class="card">
+
+  <h3>提交本次作业</h3>
+
+  <label>对应课程</label><select id="hwLesson"></select>
+
+  <label>作业名称</label><input id="hwName" type="text" placeholder="例如：直线与曲线控制练习">
+
+  <label>上传画作</label>
+
+  <div class="upload"><input type="file" id="hwFile" accept="image/*"><p class="muted">支持 JPG、PNG、WEBP。图片仅保存在当前浏览器。</p></div>
+
+  <label>本次练习心得</label><textarea id="hwNote" placeholder="我遇到了什么问题？哪些地方不确定？"></textarea>
+
+  <div class="actions"><button class="btn" onclick="submitHomework()">保存作业</button></div>
+
+ </div>
+
+ <div class="section-head"><h2>评分与教师反馈</h2></div>
+
+ <div class="card">
+
+  <p>评分应依据作品本身。当前版本提供评分表和评语记录，不会自动识别画面内容。</p>
+
+  <label>选择一份作业</label><select id="reviewSelect" onchange="loadReview()"></select>
+
+  <div id="reviewArea"><div class="empty">提交作业后，可在这里记录评分与反馈。</div></div>
+
+ </div>
+
+ <div class="section-head"><h2>历史作业</h2></div><div id="homeworkList"></div>
+
 </section>
 
-<!-- 作品档案 -->
 <section class="page" id="portfolio">
-<div class="card">
-<h2>添加作品</h2>
-<label>作品名称</label>
-<input id="workName" placeholder="给作品取一个名字">
 
-<label>角色类型</label>
-<select id="workGender">
-<option>女性角色</option>
-<option>男性角色</option>
-</select>
+ <div class="eyebrow">PORTFOLIO</div><h1>作品档案</h1>
 
-<label>绘画风格</label>
-<select id="workStyle">
-<option>动漫</option>
-<option>韩系</option>
-<option>半写实</option>
-<option>欧美</option>
-</select>
+ <p>保存每次练习和原创作品，观察长期变化。</p>
 
-<label>作品图片</label>
-<input type="file" id="workImage" accept="image/*">
+ <div class="card">
 
-<label>创作心得</label>
-<textarea id="workNote" placeholder="记录这次的优点、问题和下一步计划"></textarea>
+  <h3>添加作品</h3>
 
-<button id="saveWork">保存作品</button>
-</div>
+  <label>作品名称</label><input id="artName" type="text" placeholder="给作品起一个名字">
 
-<div class="card">
-<h2>我的作品集</h2>
-<div class="gallery" id="gallery"></div>
-</div>
+  <label>绘画风格</label><select id="artStyle"><option>动漫</option><option>韩系</option><option>半写实</option><option>欧美</option><option>写实</option><option>其他</option></select>
 
-<div class="card">
-<h2>能力评估</h2>
-<p class="muted">根据自己目前的真实水平进行评估，系统据此调整建议训练等级。</p>
-<div id="skills"></div>
-<button id="saveSkills" class="secondary">保存能力评估</button>
-</div>
+  <label>角色类型</label><select id="artType"><option>女性角色</option><option>男性角色</option><option>中性角色</option><option>其他</option></select>
+
+  <label>作品图片</label><input type="file" id="artFile" accept="image/*">
+
+  <label>创作说明</label><textarea id="artNote" placeholder="记录创作想法、难点和收获"></textarea>
+
+  <div class="actions"><button class="btn" onclick="saveArt()">保存作品</button></div>
+
+ </div>
+
+ <div class="section-head"><h2>我的作品</h2></div><div class="art-grid" id="artList"></div>
+
 </section>
 
-<!-- 对比 -->
-<section class="page" id="compare">
-<div class="card">
-<h2>作品成长对比</h2>
-<p class="muted">至少保存两张作品，才能进行对比。</p>
-<label>选择作品A</label>
-<select id="compareA"></select>
-<div id="imageA"></div>
+<section class="page" id="records">
 
-<label>选择作品B</label>
-<select id="compareB"></select>
-<div id="imageB"></div>
+ <div class="eyebrow">LEARNING JOURNAL</div><h1>学习记录</h1>
 
-<label>成长记录</label>
-<textarea id="compareNote" placeholder="比例、结构、动态、线条方面有哪些进步？"></textarea>
-<button id="saveComparison">保存对比记录</button>
-<div id="comparisonHistory"></div>
-</div>
+ <p>记录的不只是时长，还有掌握程度、错误原因和下一步训练方向。</p>
+
+ <div class="card">
+
+  <h3>今日学习记录</h3>
+
+  <label>学习日期</label><input type="date" id="recordDate">
+
+  <label>学习时长（分钟）</label><input type="number" id="recordMinutes" min="0" max="1440" value="180">
+
+  <label>今天学会了什么</label><textarea id="recordLearn" placeholder="写下真正理解的知识点"></textarea>
+
+  <label>还存在什么问题</label><textarea id="recordProblem" placeholder="具体描述画不出来的地方"></textarea>
+
+  <label>下一次训练计划</label><textarea id="recordNext" placeholder="下一次准备如何练习"></textarea>
+
+  <div class="actions"><button class="btn" onclick="saveRecord()">保存记录</button></div>
+
+ </div>
+
+ <div class="section-head"><h2>学习历史</h2></div><div id="recordList"></div>
+
 </section>
 
-<!-- 学习记忆 -->
-<section class="page" id="memory">
-<div class="card">
-<h2>我的长期学习记忆</h2>
-<label>学习目标</label>
-<textarea id="memGoal"></textarea>
+<section class="page" id="references">
 
-<label>绘画偏好</label>
-<textarea id="memPreference"></textarea>
+ <div class="eyebrow">STUDY REFERENCES</div><h1>教学资料与参考依据</h1>
 
-<label>目前存在的问题</label>
-<textarea id="memProblem"></textarea>
+ <p>参考资源用于拓展学习。每一种绘画方法都有适用范围，理解原理比机械记忆比例更重要。</p>
 
-<label>阶段总结</label>
-<textarea id="memSummary"></textarea>
+ <div class="grid">
 
-<button id="saveMemory">保存学习记忆</button>
-</div>
+  <div class="card"><h3>Proko · 人物绘画</h3><p>人物动态、人体结构、头部构造和解剖基础。适合循序渐进学习。</p><a href="https://www.proko.com/" target="_blank" rel="noopener">访问 Proko ↗</a></div>
+
+  <div class="card"><h3>Line of Action</h3><p>人物动态与姿势观察练习。注意练习时长和版权使用范围。</p><a href="https://line-of-action.com/" target="_blank" rel="noopener">访问 Line of Action ↗</a></div>
+
+  <div class="card"><h3>Quickposes</h3><p>人物姿势计时练习，帮助训练观察速度和动作概括。</p><a href="https://quickposes.com/" target="_blank" rel="noopener">访问 Quickposes ↗</a></div>
+
+  <div class="card"><h3>New Masters Academy</h3><p>传统绘画、人体、形体和结构课程。部分内容可能需要订阅。</p><a href="https://www.nma.art/" target="_blank" rel="noopener">访问 NMA ↗</a></div>
+
+ </div>
+
+ <div class="section-head"><h2>学习原则</h2></div>
+
+ <div class="card">
+
+  <h3>如何判断一张教学图是否可靠？</h3>
+
+  <p>① 明确作者或机构；② 能追溯原始出处；③ 标注它解释的具体知识；④ 区分解剖事实、教学简化和个人风格；⑤ 不把单一比例当成所有人物的绝对标准。</p>
+
+  <div class="note">本网站内置的线条、形体示意图为原创教学简图，用来解释概念，不替代专业解剖图谱或教师现场示范。</div>
+
+ </div>
+
 </section>
 
-<!-- 设置 -->
 <section class="page" id="settings">
-<div class="card">
-<h2>数据管理</h2>
-<p class="muted">导出备份可以保存你的打卡、课程进度、作品和学习记录。</p>
-<button id="export">导出全部数据</button>
-<label>导入以前的备份</label>
-<input type="file" id="import" accept=".json,application/json">
-</div>
-<div class="card">
-<h2>关于ARTIST AI</h2>
-<p class="muted">版本：4.0 单文件基础版</p>
-<p class="muted">本地数据保存在当前浏览器。更换设备或清理浏览器数据前，请先导出备份。</p>
-</div>
+
+ <div class="eyebrow">PREFERENCES & DATA</div><h1>数据管理</h1>
+
+ <div class="card">
+
+  <h3>学习目标</h3>
+
+  <label>课程开始日期</label><input type="date" id="startDate">
+
+  <label>每日计划学习时间（分钟）</label><input type="number" id="dailyGoal" min="15" max="600" value="180">
+
+  <label>长期目标</label><textarea id="longGoal">掌握人物绘画基础，能够独立设计和创作男女角色，并尝试动漫、韩系、半写实和欧美等多种风格。</textarea>
+
+  <button class="btn" onclick="saveSettings()">保存设置</button>
+
+ </div>
+
+ <div class="card" style="margin-top:14px">
+
+  <h3>备份与恢复</h3>
+
+  <p>数据保存在当前浏览器。更换设备或清除浏览器数据前，请先导出备份。</p>
+
+  <div class="actions"><button class="btn" onclick="exportData()">导出全部数据</button><label class="btn secondary" style="display:inline-block">导入备份<input type="file" accept=".json,application/json" onchange="importData(event)" hidden></label></div>
+
+  <p class="muted">作品图片也会包含在备份中，文件可能比较大。</p>
+
+ </div>
+
+ <div class="card" style="margin-top:14px">
+
+  <h3>系统说明</h3>
+
+  <p>本版本为本地学习系统。课程、示意图、作业、评分表和记录可在本地使用。真实 AI 对话、自动视觉批改、跨设备同步需要后端服务和 AI 接口，当前尚未启用。</p>
+
+ </div>
+
 </section>
 
 </main>
 
-<footer>ARTIST AI 4.0 · Character Art Academy</footer>
+</div>
+
+<nav class="mobile-nav">
+
+ <button class="active" data-page="home"><span>⌂</span>首页</button>
+
+ <button data-page="courses"><span>▤</span>课程</button>
+
+ <button data-page="classroom"><span>✎</span>课堂</button>
+
+ <button data-page="homework"><span>▧</span>作业</button>
+
+ <button data-page="portfolio"><span>▣</span>作品</button>
+
+</nav>
+
+<footer>ARTIST AI · DIGITAL ART ACADEMY · LEARN WITH UNDERSTANDING</footer>
+
+</div>
 
 <script>
-const KEY="artist_ai_4_complete";
-const blank={
- checkins:[],works:[],level:1,
- skills:{线条:1,人体结构:1,头部五官:1,动态:1,手部:1,服装:1,独立创作:1},
- memory:{goal:"",preference:"",problem:"",summary:""},
- comparisons:[],chat:[]
-};
 
-let data;
-try{
- data={...blank,...JSON.parse(localStorage.getItem(KEY)||"{}")};
-}catch(e){data={...blank};}
+const phases=[
 
-function save(){
- try{
-  localStorage.setItem(KEY,JSON.stringify(data));
- }catch(e){
-  alert("浏览器存储空间不足，请导出数据并压缩作品图片。");
- }
- render();
-}
+{name:"绘画基础与观察",weeks:"第 1—4 周",desc:"线条、形体、空间、观察与人物概括",topics:["线条与观察","几何形体与空间","形体组合与透视基础","人物概括与阶段测试"]},
 
-const courses=[
-["线条与形体","直线、曲线、椭圆、几何体、人物概括"],
-["观察与比例","头身比例、人体比例、动态轴线"],
-["人体基础","胸腔、骨盆、四肢体块"],
-["基础整合","临摹、观察、凭记忆重画"],
-["人体比例","不同体型、男女身体结构观察"],
-["动态训练","站姿、坐姿、行走、重心"],
-["躯干结构","胸腔、骨盆、脊柱关系"],
-["四肢关节","肩、肘、腕、髋、膝、踝"],
-["头部结构","头部球体、透视、仰视俯视"],
-["五官定位","眼、鼻、嘴、耳的比例"],
-["表情训练","人物情绪与微表情"],
-["发型设计","发块、发流、体积"],
-["手部结构","掌块、手指比例、手势"],
-["脚部训练","脚部结构、鞋型与透视"],
-["服装褶皱","布料、受力点、褶皱方向"],
-["全身整合","人体、姿态、服装组合"],
-["动漫风格","造型简化与风格表达"],
-["韩系半写实","柔和体积与五官"],
-["欧美风格","结构概括与夸张造型"],
-["风格转换","同一角色尝试不同风格"],
-["角色概念","人物性格与视觉关键词"],
-["服饰配色","配色、材质、服装设计"],
-["光影完成","明暗、色彩、画面整理"],
-["原创作品集","完成原创角色作品"]
+{name:"人体比例与动态",weeks:"第 5—8 周",desc:"人体比例、骨骼标志点、躯干、四肢与动态",topics:["人体比例与测量","骨骼标志点与关节","躯干体块与连接","四肢动态与阶段测试"]},
+
+{name:"头部结构与表情",weeks:"第 9—12 周",desc:"头颅、下颌、五官、表情和发型",topics:["头部基础构造","五官定位与透视","表情与面部变化","发型体块与阶段测试"]},
+
+{name:"手脚与服装",weeks:"第 13—16 周",desc:"手、脚、服装结构、褶皱和全身整合",topics:["手部结构与动作","脚部结构与透视","服装体块与褶皱","全身人物整合与测试"]},
+
+{name:"风格理解与转换",weeks:"第 17—20 周",desc:"动漫、韩系、半写实、欧美风格",topics:["动漫角色造型","韩系与半写实表达","欧美风格与造型概括","同一角色多风格转换"]},
+
+{name:"原创角色设计",weeks:"第 21—24 周",desc:"角色设定、设计语言、配色、光影与作品集",topics:["角色观察与概念设计","服装与造型设计","配色、明暗与完成度","原创作品与结业测试"]}
+
 ];
 
-const questions=[
-"找一张男性角色正面图，概括头部、胸腔和骨盆。",
-"找一张女性角色侧面图，观察肩线与骨盆倾斜。",
-"观察人物四分之三侧脸，画出头部中线。",
-"观察一只自然放松的手，先画手掌体块。",
-"观察宽松衣服，找出肩、肘、腰部的褶皱受力点。",
-"同一个角色分别尝试动漫、韩系、半写实三种画法。",
-"观察人物走路姿势，画动作线和支撑脚。",
-"设计两个不同性格的角色，只用剪影表现。",
-"画一张男性角色和一张女性角色的相同动态。",
-"观察不同角度的人脸，练习五官透视。"
+const details=[
+
+{goal:"学会控制线条方向、长度和落点，建立基本观察能力。",why:"线条是表达轮廓、方向和结构的工具。稳定的线条并不等于僵硬；关键是能够有意识地控制起点、方向、终点和力度。练习时先关注准确性与连续性，再逐步提高速度。",steps:["调整坐姿和画布，让手臂能够自然移动。","先确定线条的起点和终点，不要一边画一边猜。","用较轻的辅助线尝试方向，再用一次连贯动作完成线条。","练习 C 形、S 形曲线，观察曲率是否均匀。","画椭圆时保持整体方向一致，检查是否闭合。"],practice:["直线：横、竖、斜线各 10 条。","曲线：C 形和 S 形各 10 条。","椭圆：不同大小各 10 个。","画完后圈出最稳定的 3 条和最不稳定的 3 条。"],errors:["反复描线：容易让轮廓变脏。先用轻线定位，再用明确线条完成。","只动手指：长线容易抖动。尝试用手腕或手臂带动。","每条线都用同样力度：练习区分辅助线和明确线。"],standard:["方向控制","线条稳定性","曲线流畅度","椭圆完整度"],references:"基础线条控制与观察训练；可参考 Proko 的基础绘画与线条示范。"},
+
+{goal:"理解球体、立方体和圆柱体的体积与方向。",why:"人物可以被概括成简单体块。把复杂形体拆解成基本几何体，有助于理解朝向、空间和结构，而不是只记外轮廓。",steps:["观察一个简单物体，找出它最接近的几何体。","用轻线画出外接形状和中轴线。","为立方体画出可见面，注意边线方向。","为圆柱体画出上下椭圆，并用侧边连接。","旋转观察同一物体，比较轮廓变化。"],practice:["画 10 个不同方向的立方体。","画 10 个圆柱体，注意椭圆方向。","画 10 个球体，并用弧线表示方向。"],errors:["只画平面轮廓：补充中轴线和体块转折。","透视边线方向混乱：先统一观察方向，再画边线。","椭圆倾斜不一致：检查圆柱体的轴线。"],standard:["体块概括","空间方向","透视关系","线条清晰"],references:"基础形体构造与透视练习；属于绘画基础教学方法。"},
+
+{goal:"学会用简单形体组合表达复杂物体。",why:"形体组合能帮助理解前后关系和空间层次。透视是观察和表现空间的工具，不是把所有对象都画成机械的消失点练习。",steps:["先画整体外接框。","将对象拆成球、盒子和柱体。","检查各体块之间的遮挡关系。","添加中轴线，明确每个体块朝向。","最后才整理外轮廓。"],practice:["用 3 种几何体组合画 5 组小静物。","画同一组合的正面和斜侧面。"],errors:["一开始就画细节：先整体后局部。","体块互相穿插不清：检查遮挡与连接。"],standard:["整体概括","空间关系","体块连接","观察准确"],references:"形体构造、空间观察与基础透视。"},
+
+{goal:"将人物整体概括为头部、胸腔、骨盆和四肢。",why:"人物概括先处理整体姿势和比例，再处理局部。头、胸腔、骨盆可以视为帮助理解方向的简化体块，不代表真实人体只有几个盒子。",steps:["观察人物整体高宽比例。","用一条动作线概括姿势方向。","标出头部、胸腔和骨盆的位置。","用简单线段表示四肢方向和关节。","检查重心、支撑脚和整体平衡。"],practice:["选择 5 个不同姿势，分别用 1 分钟概括。","挑选 1 个姿势，细化头、胸腔、骨盆。"],errors:["只画轮廓不看动作：先找动作线。","四肢像木棍：标出关节与体块方向。"],standard:["整体比例","动作线","体块位置","重心判断"],references:"人物动态概括与姿势观察练习。"},
+
+{goal:"理解人体整体比例，并学会用测量比较检查。",why:"人体比例会随年龄、个体、姿势和艺术风格变化。头身比是观察工具，不是所有角色必须遵循的固定标准。",steps:["先观察人物的整体高度与宽度。","选择头部作为比较单位，粗略估计头身关系。","标出肩、胸腔、骨盆、膝和脚的位置。","比较左右肢体长度与关节位置。","对照参考图检查比例偏差。"],practice:["观察成年人物正面站姿，画 3 张比例草图。","分别画不同体型的角色，比较比例变化。"],errors:["把头身比当成绝对公式：根据对象和风格判断。","只比较长度不比较宽度：同时观察肩宽、骨盆宽。"],standard:["整体比例","测量比较","关节定位","体型观察"],references:"人物比例观察与人体结构基础。"},
+
+{goal:"认识骨骼标志点和关节对动作的影响。",why:"骨骼标志点能帮助定位身体结构。绘画时不需要记住所有医学名称，但要理解肩、肘、腕、髋、膝和踝的连接关系。",steps:["观察锁骨和肩部形成的方向。","定位肘、腕、髋、膝、踝等关节。","用线段表示骨骼方向。","观察关节弯曲时两侧体块如何变化。","将骨骼方向转换为简单体块。"],practice:["画 5 个手臂弯曲姿势。","画 5 个不同腿部支撑姿势。"],errors:["关节位置随意：先标关节再连接。","骨骼线穿过错误位置：对照参考姿势检查。"],standard:["关节定位","骨骼方向","弯曲关系","结构连接"],references:"人体骨骼基础与人物姿势观察。"},
+
+{goal:"用胸腔、骨盆和脊柱方向理解躯干。",why:"躯干不是一个平整的矩形。胸腔和骨盆会因为扭转、倾斜和弯曲产生不同朝向，脊柱连接两者并影响动作。",steps:["先画胸腔的大致体积。","画出骨盆体块和倾斜方向。","用脊柱动作线连接两者。","观察胸腔与骨盆是否同向。","添加肩线和髋线，检查扭转关系。"],practice:["画正面、侧面和扭转躯干各 3 个。","比较胸腔与骨盆的倾斜方向。"],errors:["胸腔骨盆像一块板：区分两个体块。","脊柱没有动作：观察姿势的弯曲与扭转。"],standard:["胸腔体积","骨盆方向","脊柱连接","扭转关系"],references:"躯干体块构造与人物解剖基础。"},
+
+{goal:"理解四肢的体块、关节和动作方向。",why:"四肢需要同时考虑长度、粗细、关节和透视缩短。不同角度下，肢体看起来会变短，但并不意味着真实长度改变。",steps:["先标出肩、肘、腕、髋、膝、踝。","用线段表示肢体方向。","用圆柱或简化体块表示肢体体积。","检查前后遮挡与透视缩短。","连接体块并调整外轮廓。"],practice:["画 5 个手臂姿势和 5 个腿部姿势。","挑选一个有透视缩短的姿势重点观察。"],errors:["肢体长度只凭感觉：比较关节距离。","关节像直角积木：观察软组织过渡。"],standard:["长度比例","体块方向","关节结构","透视表现"],references:"四肢构造与动态人物练习。"},
+
+{goal:"用球体、侧面和下颌构造不同角度的头部。",why:"头部可以先用颅脑球体、侧面切面和下颌结构理解。头部朝向变化时，中线和五官辅助线会随透视弯曲，不能始终画成平直十字。",steps:["画一个球体，表示颅脑的大致体积。","标出侧面切面，理解头部宽度。","添加下颌，注意下巴与颅脑的连接。","沿头部朝向画中线。","添加眉线、鼻底线和下巴位置辅助线。","检查头部整体朝向与透视。"],practice:["正面、侧面、四分之三侧面各画 3 个。","不画五官，只画结构线，检查方向是否明确。"],errors:["把头画成完整圆球：区分颅脑和下颌。","中线不随朝向变化：先明确头部旋转方向。","下颌过窄或过宽：观察面部宽度与颅脑关系。"],standard:["颅脑概括","侧面切面","下颌连接","中线透视"],references:"Loomis 头部构造方法、Proko 头部结构教学。"},
+
+{goal:"理解五官的相对位置和透视变化。",why:"五官的位置需要依附于头部体积。眼睛、鼻子和嘴巴不是贴在平面上的符号，头部转动时，远侧五官会受到透视压缩。",steps:["先确认头部中线和眉线。","沿头部曲面定位眼睛区域。","确定鼻底与下巴之间的距离关系。","观察嘴部所在的面部平面。","在不同角度下比较远近两侧的宽度。"],practice:["正面画 3 张五官定位草图。","四分之三侧面画 3 张，重点观察远侧压缩。"],errors:["五官漂浮：先建立面部平面。","两只眼睛机械等宽：考虑头部转向。","只背固定比例：根据对象、年龄和风格调整。"],standard:["五官定位","透视压缩","面部平面","整体协调"],references:"头部构造与五官透视观察。"},
+
+{goal:"通过眉、眼、嘴和面部肌肉变化表达情绪。",why:"表情不仅是嘴角变化。眉毛、眼睑、脸颊和下颌都会参与情绪表达。",steps:["选择一种明确情绪。","观察眉毛的高度、角度和间距。","观察上眼睑与下眼睑的变化。","观察嘴角、唇形和下颌变化。","对比同一角色不同情绪的结构变化。"],practice:["画开心、悲伤、愤怒、惊讶各 2 张。","同一角色画 3 种微妙情绪。"],errors:["只改嘴巴：同时观察眼眉。","表情夸张但结构崩坏：先保持头部透视。"],standard:["眉眼变化","嘴部表达","结构稳定","情绪辨识"],references:"面部表情观察与角色表演设计。"},
+
+{goal:"理解发型是有体积、方向和层次的形体。",why:"头发不是一根根线条的集合。先确定发型的大轮廓、发束方向和体积，再逐步添加细节。",steps:["先画头部结构作为发型基础。","概括发型外轮廓和整体体积。","划分主要发束方向。","确定发束之间的遮挡。","最后添加少量细节线。"],practice:["同一头部设计 3 种不同发型。","用大形状概括长发、短发和卷发。"],errors:["一开始画碎发：先确定整体轮廓。","头发紧贴头骨：注意发型体积。"],standard:["整体轮廓","发束方向","体积感","层次关系"],references:"头部造型与发型体块设计。"},
+
+{goal:"理解手掌、手指和关节的基本结构。",why:"手掌和手指不是五根相同长度的棍子。手掌有体积，手指分节，拇指方向与其余手指不同。",steps:["先概括手掌的大形状。","标出腕部和手掌连接。","定位四指的根部与指尖。","单独理解拇指的方向和活动范围。","添加指节与体积转折。"],practice:["手掌正面、背面各画 3 张。","画握拳、张开和捏取动作。"],errors:["手指长度相同：观察长短差异。","拇指位置错误：先理解拇指根部。"],standard:["手掌概括","指节关系","拇指结构","动作表达"],references:"手部结构观察与解剖绘画基础。"},
+
+{goal:"理解脚掌、脚踝和腿部的连接。",why:"脚部需要承担支撑和方向表达。观察脚跟、脚背、脚趾和踝部之间的体积关系。",steps:["用楔形体概括脚部。","标出脚跟与脚尖方向。","连接脚踝和小腿。","观察脚背高度与脚掌厚度。","从侧面和斜前方检查体积。"],practice:["画脚部侧面、正面和斜侧面。","画站立、踮脚和行走时的脚部。"],errors:["脚像平板：补充脚背和脚跟体积。","脚踝连接生硬：观察小腿到脚部的过渡。"],standard:["脚掌体积","脚踝连接","方向透视","支撑关系"],references:"脚部构造与人体动态观察。"},
+
+{goal:"理解服装覆盖人体后的体积与褶皱。",why:"服装褶皱受到支撑点、拉力、重力和材质影响。不能在衣服上随意添加装饰线条。",steps:["先画人体基础体块。","确定衣服与身体接触、悬垂的位置。","标出拉力方向和主要褶皱起点。","区分紧身、宽松和厚重材质。","最后整理褶皱线的粗细与节奏。"],practice:["同一人体穿紧身衣和宽松衣各一张。","观察袖口、肘部、腰部的褶皱。"],errors:["褶皱平均分布：寻找受力点。","衣服像贴纸：先考虑人体体积。"],standard:["人体基础","褶皱起点","材质区别","服装体积"],references:"服装褶皱观察与人物造型设计。"},
+
+{goal:"把头、躯干、四肢和服装整合为完整人物。",why:"局部画得好不代表整体成立。全身人物需要统一比例、动作、重心、结构和服装关系。",steps:["先画整体动作线。","概括头、胸腔和骨盆。","连接四肢并标记关节。","检查比例与重心。","添加头部、手脚和服装。","最后统一线条与细节层级。"],practice:["完成一张全身站姿人物。","完成一张带动作的全身人物。"],errors:["局部精细整体失衡：回到缩略图检查。","动作僵硬：重新寻找动作线与重心。"],standard:["整体比例","动作与重心","结构连接","完成度"],references:"全身人物构造与综合练习。"},
+
+{goal:"理解动漫角色造型中的概括、比例与设计选择。",why:"动漫不是单一固定比例。不同作品会改变头身比、眼睛大小、轮廓和线条语言，但仍然需要稳定的结构和角色设计逻辑。",steps:["选择一种明确的动漫风格作为观察对象。","记录头身比、眼睛比例和轮廓特征。","先画结构，再进行风格化夸张。","保持角色不同角度的一致性。"],practice:["设计同一角色的正面和侧面。","尝试两种不同动漫风格。"],errors:["只放大眼睛：同时考虑头部和五官关系。","照搬风格却结构混乱：先建立基础结构。"],standard:["风格观察","结构稳定","造型统一","角色辨识"],references:"角色造型分析与风格化人物设计。"},
+
+{goal:"理解韩系和半写实角色的比例、轮廓与细节取舍。",why:"韩系和半写实是宽泛的风格称呼，不是统一公式。学习重点是分析参考作品的比例、五官简化、边缘和明暗处理。",steps:["选择具体作品作为风格样本。","分析头部和身体比例。","比较五官简化程度。","观察线条与明暗的处理。","尝试用相同结构画出不同风格。"],practice:["同一角色完成韩系与半写实两张草图。"],errors:["只改变眼睛：整体比例和边缘语言也要变化。","过度细化：明确视觉重点。"],standard:["比例选择","五官概括","明暗处理","风格统一"],references:"风格分析与人物造型观察。"},
+
+{goal:"理解欧美人物造型中的形体概括与夸张。",why:"欧美风格内部差异很大。部分造型强调强烈体块、轮廓和比例夸张，但不能把所有作品归为同一画法。",steps:["选择具体作品并观察人物体型。","比较头、胸腔、骨盆和四肢比例。","概括轮廓转折和体块方向。","观察线条、明暗与色彩取舍。","设计一个具有相似造型语言的原创角色。"],practice:["画一张风格分析草图。","将同一角色转换为另一种造型语言。"],errors:["只夸张肌肉：整体轮廓也需要统一。","比例失控：先明确设计意图。"],standard:["形体概括","比例设计","轮廓语言","整体一致"],references:"人物造型设计与风格比较。"},
+
+{goal:"让同一角色在不同风格下保持身份一致。",why:"风格转换不等于随机改变五官。需要保留角色的核心特征，例如发型、脸部轮廓、气质和服装识别元素。",steps:["写下角色的 3 个核心识别特征。","画出基础结构稿。","分别制定不同风格的比例和线条方案。","转换五官和细节表达。","比较角色是否仍然容易辨认。"],practice:["同一角色完成动漫、半写实和欧美三版。"],errors:["每版都变成不同的人：保留核心识别点。"],standard:["角色一致性","风格区别","比例控制","设计表达"],references:"角色设计与风格迁移练习。"},
+
+{goal:"从观察和需求出发建立原创角色概念。",why:"原创设计需要明确角色身份、性格、用途和视觉主题。不是先堆叠漂亮元素，而是让造型服务于角色设定。",steps:["写下角色背景与性格关键词。","选择年龄、体型和气质方向。","搜集合法使用的视觉参考。","画多个小型轮廓方案。","选出最清晰的方案再深入。"],practice:["为一个原创角色写设定卡。","画 6 个不同轮廓草案。"],errors:["元素堆积：删去不服务角色的设计。","设定与造型脱节：检查每个视觉选择的理由。"],standard:["设定清晰","造型辨识","设计逻辑","方案探索"],references:"角色概念设计与视觉开发。"},
+
+{goal:"建立角色服装、配件和轮廓的设计逻辑。",why:"服装设计需要考虑角色身份、活动需求、材质、层次和视觉重点。服装必须能够穿在一个真实或设定合理的人体上。",steps:["明确角色生活环境和活动需求。","选择服装轮廓与层次。","确定主材质和配件功能。","检查服装与人体动作的关系。","完成正面、侧面或关键细节稿。"],practice:["为同一角色设计日常、正式和户外三套服装。"],errors:["配件没有用途：说明每个设计元素的理由。","服装遮挡结构：先建立人体姿势。"],standard:["服装逻辑","轮廓层次","材质区分","角色统一"],references:"服装设计与角色视觉开发。"},
+
+{goal:"理解配色、明暗和视觉重点。",why:"色彩需要服务于角色气质和画面层次。明暗关系先于复杂材质细节，色彩搭配也要考虑明度和饱和度。",steps:["确定画面的主要光源方向。","用简单灰阶区分亮部、中间调和暗部。","选择主色、辅助色和强调色。","检查人物与背景的视觉区分。","最后添加材质和局部细节。"],practice:["同一角色完成两套不同配色。","制作一张简单灰阶明暗练习。"],errors:["颜色很多但重点不清：减少主色数量。","明暗没有光源逻辑：先确定光线方向。"],standard:["明暗层次","色彩关系","光源逻辑","视觉重点"],references:"色彩基础与人物光影练习。"},
+
+{goal:"完成原创角色作品并进行自我评估。",why:"结业作品需要展示观察、结构、造型、风格和设计能力。评分不仅看漂亮程度，还要看是否能够独立完成并解释设计选择。",steps:["写出角色设定与作品目标。","完成多个草案并选择方案。","建立结构和比例。","完善服装、五官和动作。","完成线稿、色彩和明暗。","写创作复盘并整理作品集。"],practice:["完成一张原创全身角色设计。","附上结构草图、配色方案和设计说明。"],errors:["直接跳入细节：先完成整体方案。","只展示成图：保留过程图便于评估。"],standard:["结构能力","造型设计","风格控制","作品完整度"],references:"综合人物设计与作品集评估。"}
+
 ];
 
-const $=id=>document.getElementById(id);
-const today=()=>new Date().toLocaleDateString("sv-SE");
-const escapeHTML=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const stateKey="artist_ai_5_data";
 
-function currentWeek(){
- const start=new Date("2027-01-15T00:00:00");
- return Math.max(1,Math.min(24,Math.ceil((Date.now()-start.getTime()+86400000)/604800000)));
+let data=loadData();
+
+let selectedLesson=0;
+
+function loadData(){try{return JSON.parse(localStorage.getItem(stateKey))||{done:[],works:[],homeworks:[],records:[],settings:{}}}catch(e){return{done:[],works:[],homeworks:[],records:[],settings:{}}}}
+
+function persist(){localStorage.setItem(stateKey,JSON.stringify(data));refresh()}
+
+function refresh(){updateStats();renderCourseList();renderArt();renderHomework();renderRecords();updateReviewSelect()}
+
+function saveData(){localStorage.setItem(stateKey,JSON.stringify(data))}
+
+function go(page){
+
+ document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+
+ document.getElementById(page).classList.add("active");
+
+ document.querySelectorAll("[data-page]").forEach(x=>x.classList.toggle("active",x.dataset.page===page));
+
+ if(page==="classroom")renderLesson();
+
+ if(page==="homework")renderHomework();
+
+ if(page==="portfolio")renderArt();
+
+ if(page==="records")renderRecords();
+
+ window.scrollTo(0,0)
+
 }
 
-function render(){
- const week=currentWeek();
- $("date").textContent=today()+" · 第 "+week+" 周";
- $("days").textContent=data.checkins.length;
- $("works").textContent=data.works.length;
- $("level").textContent=data.level;
- $("progress").style.width=Math.min(100,data.checkins.length/168*100)+"%";
- $("progressText").textContent="累计打卡 "+data.checkins.length+" 天";
- $("weekTitle").textContent="第 "+week+" 周："+courses[week-1][0];
- $("weekDescription").textContent=courses[week-1][1];
- const done=data.checkins.includes(today());
- $("checkin").disabled=done;
- $("checkin").textContent=done?"今日已经完成打卡":"完成今日打卡";
- $("todayTask").textContent=done?"今天的训练已完成":"今天也来画画吧！";
+document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.page)));
 
- $("courses").innerHTML=courses.map((c,i)=>`
- <div class="item">
- <b>第${i+1}周 · ${c[0]}</b>
- <p class="muted">${c[1]}</p>
- <span class="tag">${i<4?"基础阶段":i<8?"人体阶段":i<16?"专项阶段":i<20?"风格阶段":"创作阶段"}</span>
- </div>`).join("");
+function weekTitle(i){let p=Math.floor(i/4);return "第 "+(i+1)+" 周 · "+phases[p].topics[i%4]}
 
- $("gallery").innerHTML=data.works.map((w,i)=>`
- <div class="work">
- <img src="${w.image}" alt="">
- <b>${escapeHTML(w.name)}</b>
- <p class="muted">${escapeHTML(w.gender)} · ${escapeHTML(w.style)}</p>
- <p class="muted">${escapeHTML(w.date)}</p>
- <p class="muted">${escapeHTML(w.note)}</p>
- <button class="danger" onclick="deleteWork(${i})">删除</button>
- </div>`).join("")||'<p class="muted">还没有作品，上传你的第一张练习吧。</p>';
+function updateStats(){
 
- $("skills").innerHTML=Object.entries(data.skills).map(([k,v])=>`
- <label>${k}：<b>${v}/5</b>
- <input type="range" min="1" max="5" value="${v}" data-skill="${k}">
- </label>`).join("");
+ document.getElementById("statDone").textContent=data.done.length;
 
- $("memGoal").value=data.memory.goal||"";
- $("memPreference").value=data.memory.preference||"";
- $("memProblem").value=data.memory.problem||"";
- $("memSummary").value=data.memory.summary||"";
+ document.getElementById("statWorks").textContent=data.works.length;
 
- fillCompare();
+ document.getElementById("statDays").textContent=new Set(data.records.map(r=>r.date)).size;
+
+ let n=data.done.length/24*100;
+
+ document.getElementById("overallProgress").style.width=n+"%";
+
+ document.getElementById("progressText").textContent="已完成 "+data.done.length+" / 24 周";
+
+ let next=data.done.length<24?data.done.length:23;
+
+ document.getElementById("currentTitle").textContent=weekTitle(next);
+
+ document.getElementById("currentDesc").textContent=details[next].goal;
+
 }
 
-function showPage(id){
- document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));
- document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
+function renderHome(){
+
+ document.getElementById("phaseCards").innerHTML=phases.map((p,i)=>`<div class="course-card" onclick="go('courses')"><span class="tag">${p.weeks}</span><h3>${p.name}</h3><p>${p.desc}</p><div class="progress"><i style="width:${data.done.filter(x=>Math.floor(x/4)===i).length/4*100}%"></i></div><span class="muted">${data.done.filter(x=>Math.floor(x/4)===i).length}/4 周完成</span></div>`).join("");
+
 }
 
-$("nav").addEventListener("click",e=>{
- const b=e.target.closest("[data-page]");
- if(b)showPage(b.dataset.page);
-});
+function renderCourseList(){
 
-$("checkin").onclick=()=>{
- if(!data.checkins.includes(today()))data.checkins.push(today());
- save();
-};
+ document.getElementById("courseList").innerHTML=phases.map((p,i)=>`<div class="card" style="margin-bottom:14px"><div class="eyebrow">${p.weeks}</div><h2>${p.name}</h2><p>${p.desc}</p><div class="grid">${p.topics.map((t,j)=>{let k=i*4+j;return `<div class="course-card" onclick="openLesson(${k})"><span class="tag">第 ${k+1} 周</span><h3>${t}</h3><p>${details[k].goal}</p><span class="muted">${data.done.includes(k)?"✓ 已完成":"点击进入课程 →"}</span></div>`}).join("")}</div></div>`).join("");
 
-$("generate").onclick=()=>{
- const gender=$("gender").value;
- const style=$("style").value;
- const topic=$("topic").value;
- const level=+$("difficulty").value;
- const details=[
- "先观察整体轮廓，分析比例和方向。",
- "用简单几何形概括主要结构。",
- "关闭参考图，凭记忆独立重画。",
- "对照参考，标出最明显的两个差异。"
- ];
- const difficultyText=[
- "基础：先保证大形和比例，不追求细节。",
- "进阶：加入透视变化、结构连接和线条。",
- "挑战：加入动态、设计选择和风格表达。"
- ];
- $("exercise").innerHTML=`
- <h3>你的专属练习</h3>
- <span class="tag">${gender}</span><span class="tag">${style}</span>
- <span class="tag">${topic}</span>
- <p>${details.join("<br>")}</p>
- <p><b>${difficultyText[level-1]}</b></p>
- <p class="muted">建议用时：60分钟。额外挑战：换另一种性别角色再画一遍。</p>
- <button onclick="copyExercise()">复制练习内容</button>`;
- window.currentExercise=`${gender} ${style} ${topic}\n${details.join("\n")}\n${difficultyText[level-1]}`;
-};
-
-window.copyExercise=()=>{
- if(navigator.clipboard){
- navigator.clipboard.writeText(window.currentExercise).then(()=>alert("练习已复制"));
- }else alert(window.currentExercise);
-};
-
-$("randomQuestion").onclick=()=>{
- $("question").textContent=questions[Math.floor(Math.random()*questions.length)];
-};
-
-$("saveWork").onclick=()=>{
- const file=$("workImage").files[0];
- if(!file){alert("请先选择作品图片");return;}
- if(file.size>1500000){alert("图片太大，请压缩到1.5MB以内再上传。");return;}
- const reader=new FileReader();
- reader.onload=()=>{
-  data.works.push({
-   name:$("workName").value||"未命名作品",
-   gender:$("workGender").value,
-   style:$("workStyle").value,
-   note:$("workNote").value,
-   image:reader.result,
-   date:today()
-  });
-  $("workName").value="";
-  $("workNote").value="";
-  $("workImage").value="";
-  save();
-  alert("作品保存成功！");
- };
- reader.readAsDataURL(file);
-};
-
-window.deleteWork=i=>{
- if(confirm("确定删除这张作品吗？")){
- data.works.splice(i,1);
- save();
- }
-};
-
-$("saveSkills").onclick=()=>{
- document.querySelectorAll("[data-skill]").forEach(el=>{
-  data.skills[el.dataset.skill]=+el.value;
- });
- const avg=Object.values(data.skills).reduce((a,b)=>a+b,0)/Object.keys(data.skills).length;
- data.level=avg<2.3?1:avg<3.8?2:3;
- save();
- alert("能力评估已保存，建议训练等级："+data.level);
-};
-
-function fillCompare(){
- const opts=data.works.map((w,i)=>`<option value="${i}">${escapeHTML(w.name)} · ${w.date}</option>`).join("");
- $("compareA").innerHTML=opts;
- $("compareB").innerHTML=opts;
- if(data.works.length>1)$("compareB").value=1;
- renderCompare();
- $("comparisonHistory").innerHTML=data.comparisons.map(c=>`
- <div class="item"><b>${c.date}</b><p>${escapeHTML(c.note)}</p></div>`).join("");
 }
 
-function renderCompare(){
- ["A","B"].forEach(k=>{
-  const i=+$("compare"+k).value;
-  const w=data.works[i];
-  $("image"+k).innerHTML=w?
-  `<img class="preview" src="${w.image}"><p class="muted">${escapeHTML(w.name)}</p>`:
-  '<p class="muted">请先保存作品。</p>';
- });
+function initSelects(){
+
+ let opts=phases.flatMap((p,i)=>p.topics.map((t,j)=>`<option value="${i*4+j}">第 ${i*4+j+1} 周 · ${t}</option>`)).join("");
+
+ document.getElementById("lessonSelect").innerHTML=opts;
+
+ document.getElementById("hwLesson").innerHTML=opts;
+
+ document.getElementById("lessonSelect").value=selectedLesson;
+
 }
 
-$("compareA").onchange=renderCompare;
-$("compareB").onchange=renderCompare;
+function openLesson(i){selectedLesson=i;go("classroom")}
 
-$("saveComparison").onclick=()=>{
- if(data.works.length<2){alert("至少需要两张作品才能进行对比。");return;}
- const note=$("compareNote").value.trim();
- if(!note){alert("请先填写对比心得。");return;}
- data.comparisons.push({date:today(),note});
- $("compareNote").value="";
- save();
- alert("对比记录已保存！");
-};
+function selectLesson(v){selectedLesson=Number(v);renderLesson()}
 
-$("saveMemory").onclick=()=>{
- data.memory={
- goal:$("memGoal").value,
- preference:$("memPreference").value,
- problem:$("memProblem").value,
- summary:$("memSummary").value
- };
- save();
- alert("学习记忆保存成功！");
-};
+function diagram(type){
 
-$("sendQuestion").onclick=()=>{
- const q=$("questionInput").value.trim();
- if(!q)return;
- $("chat").innerHTML+=`<div class="bubble me">${escapeHTML(q)}</div>
- <div class="bubble bot">目前尚未连接真正的AI服务，所以我还不能生成智能回答。你的问题可以先记录下来；连接后端后即可让AI导师分析。</div>`;
- $("questionInput").value="";
- $("chat").scrollTop=$("chat").scrollHeight;
-};
+ if(type==="lines")return `<div class="diagram"><svg viewBox="0 0 500 190" role="img" aria-label="直线和曲线练习示意"><g fill="none" stroke="#8175a8" stroke-width="3" stroke-linecap="round"><path d="M35 35 L205 35 M35 70 L205 70 M35 105 L205 105 M35 140 L205 140"/><path d="M275 100 Q320 5 370 100 T465 100" stroke="#78917d"/><path d="M275 150 C315 65 370 65 465 150" stroke="#c29b66"/></g><g fill="#777" font-size="12"><text x="35" y="20">方向与落点</text><text x="275" y="20">曲线连续性</text></g></svg><div class="diagram-caption">原创教学简图：先确定方向和落点，再用连贯动作完成线条。</div></div>`;
 
-let analysisImage="";
-$("analysisFile").onchange=e=>{
- const f=e.target.files[0];
- if(!f)return;
- if(f.size>5000000){alert("图片请控制在5MB以内");return;}
- const reader=new FileReader();
- reader.onload=()=>{
-  analysisImage=reader.result;
-  $("analysisPreview").src=analysisImage;
-  $("analysisPreview").hidden=false;
- };
- reader.readAsDataURL(f);
-};
+ if(type==="shapes")return `<div class="diagram"><svg viewBox="0 0 500 210"><g stroke="#8175a8" stroke-width="2.5" fill="#e9e3f1"><circle cx="85" cy="90" r="48"/><path d="M190 55 L270 35 L315 70 L235 92 Z M190 55 L190 140 L235 178 L235 92 M235 178 L315 150 L315 70" fill="#e8e4ee"/><path d="M375 65 L455 65 L455 145 L375 145 Z" fill="#e8eee7"/><ellipse cx="415" cy="65" rx="40" ry="13" fill="#dce6dc"/><ellipse cx="415" cy="145" rx="40" ry="13" fill="#dce6dc"/></g><g fill="#6c6674" font-size="12"><text x="62" y="165">球体</text><text x="230" y="198">立方体</text><text x="393" y="185">圆柱体</text></g></svg><div class="diagram-caption">原创教学简图：用基本体块理解体积和方向。</div></div>`;
 
-$("analyze").onclick=()=>{
- if(!analysisImage){alert("请先上传作品");return;}
- $("analysisResult").textContent="图片已选择，但真正的视觉分析需要连接支持图像输入的AI后端。当前不会伪造分析结果。";
-};
+ if(type==="head")return `<div class="diagram"><svg viewBox="0 0 500 300"><g fill="none" stroke="#8275a7" stroke-width="2.5"><circle cx="240" cy="125" r="82" fill="#eeeaf4"/><path d="M177 138 Q170 185 204 213 L240 238 L282 213 Q310 180 302 135" fill="#f6f0e9" stroke="#b79572"/><path d="M240 44 Q250 110 240 238" stroke-dasharray="5 5"/><path d="M160 125 Q240 112 320 125" stroke="#758e7b"/><path d="M183 170 Q240 160 298 170" stroke="#c39b68"/><path d="M206 210 Q240 220 274 210" stroke="#c39b68"/></g><g fill="#716a78" font-size="12"><text x="335" y="48">颅脑体积</text><text x="335" y="125">中线与眉线</text><text x="335" y="172">鼻底辅助线</text><text x="335" y="215">下颌与下巴</text></g></svg><div class="diagram-caption">原创简化示意：颅脑、下颌、中线和辅助线。不是精确解剖图谱。</div></div>`;
 
-$("export").onclick=()=>{
- const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
- const url=URL.createObjectURL(blob);
- const a=document.createElement("a");
- a.href=url;a.download="ARTIST_AI_学习备份.json";a.click();
- URL.revokeObjectURL(url);
-};
+ if(type==="body")return `<div class="diagram"><svg viewBox="0 0 500 300"><g stroke="#8175a8" stroke-width="2.5" fill="#eeeaf4"><circle cx="240" cy="42" r="24"/><path d="M205 83 Q240 62 275 83 L292 155 L270 177 L210 177 L188 155 Z"/><path d="M210 177 L270 177 L286 202 L194 202 Z" fill="#e8eee7"/><path d="M205 94 L145 155 L130 220 M275 94 L330 155 L350 215 M208 202 L195 255 L180 285 M270 202 L285 255 L300 285" fill="none" stroke-width="12" stroke-linecap="round"/><path d="M240 67 L240 195" stroke-dasharray="4 5"/></g><g fill="#716a78" font-size="12"><text x="25" y="80">头部</text><text x="25" y="140">胸腔</text><text x="25" y="200">骨盆</text><text x="365" y="160">关节</text></g></svg><div class="diagram-caption">原创简化体块图：用于理解人体分段与关节位置，不代表真实解剖比例。</div></div>`;
 
-$("import").onchange=async e=>{
- const f=e.target.files[0];
- if(!f)return;
- try{
-  const d=JSON.parse(await f.text());
-  if(!Array.isArray(d.checkins)||!Array.isArray(d.works))throw Error();
-  data={...blank,...d};
-  save();
-  alert("数据恢复成功！");
- }catch(err){
-  alert("备份文件格式错误，无法导入。");
- }
-};
+ return `<div class="diagram"><svg viewBox="0 0 500 190"><g stroke="#8175a8" stroke-width="3" fill="none"><path d="M70 145 L145 50 L220 145 Z"/><path d="M280 145 Q340 30 420 145"/><path d="M280 145 L420 145" stroke="#c29b68"/></g><g fill="#777" font-size="12"><text x="70" y="170">整体形状</text><text x="300" y="170">方向与体积</text></g></svg><div class="diagram-caption">原创结构示意：先概括整体，再补充局部。</div></div>`;
 
-render();
+}
+
+function renderLesson(){
+
+ let d=details[selectedLesson],p=phases[Math.floor(selectedLesson/4)];
+
+ document.getElementById("lessonSelect").value=selectedLesson;
+
+ document.getElementById("lessonGoal").textContent=d.goal;
+
+ document.getElementById("lessonStatus").textContent=data.done.includes(selectedLesson)?"本周已标记完成":"尚未完成";
+
+ document.getElementById("lessonProgress").style.width=data.done.includes(selectedLesson)?"100%":"0%";
+
+ let diag=selectedLesson===0?"lines":selectedLesson===1?"shapes":selectedLesson===8?"head":selectedLesson===4||selectedLesson===6||selectedLesson===7?"body":"other";
+
+ document.getElementById("lessonContent").innerHTML=`
+
+ <div class="lesson-block"><div class="eyebrow">${p.weeks} · 第 ${selectedLesson+1} 周</div><h2>${p.topics[selectedLesson%4]}</h2><p>${d.goal}</p><div class="tag">本节原理讲解</div><h3>一、先理解为什么要这样画</h3><p>${d.why}</p>${diagram(diag)}<div class="note">老师提醒：先观察整体，再分析局部。不要把简化示意图误认为所有人物都必须遵循的固定公式。</div></div>
+
+ <div class="lesson-block"><h3>二、老师分步骤示范</h3>${d.steps.map((s,i)=>`<div class="step"><span class="step-no">${i+1}</span><div>${s}</div></div>`).join("")}<div class="warning">示范图是教学结构简图。正式练习时，请结合本节列出的专业参考资源观察真实人物或可靠解剖资料。</div></div>
+
+ <div class="lesson-block"><h3>三、常见错误与修改方法</h3>${d.errors.map((s,i)=>`<div class="step"><span class="step-no">!</span><div>${s}</div></div>`).join("")}</div>
+
+ <div class="lesson-block"><h3>四、跟着老师练习</h3><p>先按照步骤完成练习，不急着加细节。每完成一项，就检查一次整体方向和结构。</p>${d.practice.map((s,i)=>`<div class="check"><input type="checkbox" id="practice${i}"><label for="practice${i}" style="margin:0">${s}</label></div>`).join("")}</div>
+
+ <div class="lesson-block"><h3>五、课后作业</h3><p>请把下面的任务完成后，前往「作业与批改」上传作品。</p>${d.practice.map((s,i)=>`<div class="check"><input type="checkbox" id="task${i}"><label for="task${i}" style="margin:0">${s}</label></div>`).join("")}<div class="note">建议每天学习 3 小时：知识理解 30 分钟、示范观察 30 分钟、跟画练习 60 分钟、独立作业 45 分钟、复盘 15 分钟。根据难度灵活调整。</div></div>
+
+ <div class="lesson-block"><h3>六、教师评价标准</h3><table><tr><th>评价项目</th><th>本节重点</th></tr>${d.standard.map(s=>`<tr><td>${s}</td><td>检查准确性、结构理解和练习完成度</td></tr>`).join("")}</table><p class="muted">本页不自动识别画作。上传后请依据标准进行自查，或由真正的教师/后续 AI 服务评阅。</p><div class="actions"><button class="btn" onclick="markDone()">标记本周学习完成</button><button class="btn secondary" onclick="go('homework')">去提交作业</button></div></div>
+
+ <div class="lesson-block"><h3>七、教学参考依据</h3><p>${d.references}</p><p class="muted">参考资料用于延伸学习；具体方法应结合原始课程、示范作者和实际对象判断。</p></div>`;
+
+}
+
+function markDone(){if(!data.done.includes(selectedLesson))data.done.push(selectedLesson);persist();renderLesson();renderHome();alert("已记录本周完成。请记得提交练习作品。")}
+
+function submitHomework(){
+
+ let file=document.getElementById("hwFile").files[0];
+
+ let name=document.getElementById("hwName").value.trim();
+
+ if(!name){alert("请填写作业名称");return}
+
+ const save=(img)=>{data.homeworks.unshift({id:Date.now(),lesson:Number(document.getElementById("hwLesson").value),name,img,note:document.getElementById("hwNote").value,date:new Date().toISOString().slice(0,10),review:null});persist();document.getElementById("hwName").value="";document.getElementById("hwNote").value="";document.getElementById("hwFile").value="";alert("作业已保存！");};
+
+ if(file){if(file.size>5*1024*1024){alert("图片请控制在 5MB 以内");return}let r=new FileReader();r.onload=()=>save(r.result);r.readAsDataURL(file)}else save("");
+
+}
+
+function updateReviewSelect(){
+
+ let s=document.getElementById("reviewSelect");if(!s)return;
+
+ s.innerHTML=data.homeworks.map(h=>`<option value="${h.id}">${h.name} · ${h.date}</option>`).join("");
+
+ if(data.homeworks.length)loadReview();else document.getElementById("reviewArea").innerHTML='<div class="empty">提交作业后，可在这里记录评分与反馈。</div>';
+
+}
+
+function loadReview(){
+
+ let id=Number(document.getElementById("reviewSelect").value),h=data.homeworks.find(x=>x.id===id);
+
+ if(!h){document.getElementById("reviewArea").innerHTML='<div class="empty">暂无作业</div>';return}
+
+ let d=details[h.lesson],r=h.review||{scores:[0,0,0,0],comment:"",problem:"",next:""};
+
+ document.getElementById("reviewArea").innerHTML=`
+
+ <h3>${h.name}</h3>${h.img?`<img src="${h.img}" style="max-width:100%;max-height:260px;object-fit:contain;border-radius:10px">`:""}
+
+ <p class="muted">${weekTitle(h.lesson)} · ${h.date}</p><p>${escapeHtml(h.note||"没有填写练习心得")}</p>
+
+ <table><tr><th>评分项目</th><th>得分（0—25）</th></tr>${d.standard.map((s,i)=>`<tr><td>${s}</td><td><input class="score-input" type="number" min="0" max="25" id="score${i}" value="${r.scores[i]||0}"></td></tr>`).join("")}</table>
+
+ <p id="scoreTotal" class="eyebrow">总分：${r.scores.reduce((a,b)=>a+Number(b),0)} / 100</p>
+
+ <label>教师评语：本次做得好的地方</label><textarea id="reviewComment">${escapeHtml(r.comment)}</textarea>
+
+ <label>主要问题与错误原因</label><textarea id="reviewProblem">${escapeHtml(r.problem)}</textarea>
+
+ <label>下一步补习方案</label><textarea id="reviewNext">${escapeHtml(r.next)}</textarea>
+
+ <div class="actions"><button class="btn" onclick="saveReview(${h.id})">保存评价</button></div>
+
+ <div class="warning">评分表是人工填写的记录工具，不会自动分析图片。请勿将自评分数误认为 AI 识别结果。</div>`;
+
+ document.querySelectorAll(".score-input").forEach(x=>x.addEventListener("input",()=>{let n=[0,1,2,3].reduce((a,i)=>a+Math.max(0,Math.min(25,Number(document.getElementById("score"+i).value)||0)),0);document.getElementById("scoreTotal").textContent="总分："+n+" / 100"}));
+
+}
+
+function saveReview(id){
+
+ let h=data.homeworks.find(x=>x.id===id);if(!h)return;
+
+ let scores=[0,1,2,3].map(i=>Math.max(0,Math.min(25,Number(document.getElementById("score"+i).value)||0)));
+
+ h.review={scores,comment:document.getElementById("reviewComment").value,problem:document.getElementById("reviewProblem").value,next:document.getElementById("reviewNext").value,date:new Date().toISOString().slice(0,10)};
+
+ persist();alert("评价已保存。");
+
+}
+
+function renderHomework(){
+
+ let box=document.getElementById("homeworkList");if(!box)return;
+
+ box.innerHTML=data.homeworks.length?data.homeworks.map(h=>`<div class="card" style="margin-bottom:10px"><strong>${escapeHtml(h.name)}</strong><p class="muted">${weekTitle(h.lesson)} · ${h.date}</p>${h.review?`<span class="tag">已有评价 · ${h.review.scores.reduce((a,b)=>a+b,0)} 分</span>`:'<span class="tag">待评价</span>'}<div class="actions"><button class="btn small secondary" onclick="document.getElementById('reviewSelect').value='${h.id}';loadReview()">查看评价</button><button class="btn small danger" onclick="deleteHomework(${h.id})">删除</button></div></div>`).join(""):'<div class="empty">还没有提交作业。</div>';
+
+}
+
+function deleteHomework(id){if(confirm("确定删除这份作业吗？")){data.homeworks=data.homeworks.filter(h=>h.id!==id);persist()}}
+
+function saveArt(){
+
+ let f=document.getElementById("artFile").files[0],name=document.getElementById("artName").value.trim();
+
+ if(!name){alert("请填写作品名称");return}
+
+ const add=img=>{data.works.unshift({id:Date.now(),name,style:document.getElementById("artStyle").value,type:document.getElementById("artType").value,note:document.getElementById("artNote").value,img,date:new Date().toISOString().slice(0,10)});persist();document.getElementById("artName").value="";document.getElementById("artNote").value="";document.getElementById("artFile").value="";alert("作品已保存")};
+
+ if(f){if(f.size>5*1024*1024){alert("图片请控制在 5MB 以内");return}let r=new FileReader();r.onload=()=>add(r.result);r.readAsDataURL(f)}else add("");
+
+}
+
+function renderArt(){
+
+ let el=document.getElementById("artList");if(!el)return;
+
+ el.innerHTML=data.works.length?data.works.map(w=>`<div class="art">${w.img?`<img src="${w.img}">`:'<div class="empty">无图片</div>'}<strong>${escapeHtml(w.name)}</strong><div class="muted">${w.type} · ${w.style}</div><div class="muted">${w.date}</div><p>${escapeHtml(w.note||"")}</p><button class="btn small danger" onclick="deleteArt(${w.id})">删除作品</button></div>`).join(""):'<div class="empty" style="grid-column:1/-1">还没有作品。上传你的第一张练习吧。</div>';
+
+}
+
+function deleteArt(id){if(confirm("确定删除这件作品吗？")){data.works=data.works.filter(w=>w.id!==id);persist()}}
+
+function saveRecord(){
+
+ let date=document.getElementById("recordDate").value;if(!date){alert("请选择日期");return}
+
+ data.records.unshift({id:Date.now(),date,minutes:Number(document.getElementById("recordMinutes").value)||0,learn:document.getElementById("recordLearn").value,problem:document.getElementById("recordProblem").value,next:document.getElementById("recordNext").value});
+
+ persist();alert("学习记录已保存")
+
+}
+
+function renderRecords(){
+
+ let el=document.getElementById("recordList");if(!el)return;
+
+ el.innerHTML=data.records.length?data.records.map(r=>`<div class="card" style="margin-bottom:10px"><div class="eyebrow">${r.date} · ${r.minutes} 分钟</div><h3>今日学习复盘</h3><p><b>学会了：</b>${escapeHtml(r.learn||"未填写")}</p><p><b>遇到的问题：</b>${escapeHtml(r.problem||"未填写")}</p><p><b>下一步：</b>${escapeHtml(r.next||"未填写")}</p><button class="btn small danger" onclick="deleteRecord(${r.id})">删除记录</button></div>`).join(""):'<div class="empty">还没有学习记录。</div>';
+
+}
+
+function deleteRecord(id){if(confirm("删除这条记录？")){data.records=data.records.filter(r=>r.id!==id);persist()}}
+
+function saveSettings(){
+
+ data.settings={startDate:document.getElementById("startDate").value,dailyGoal:document.getElementById("dailyGoal").value,longGoal:document.getElementById("longGoal").value};persist();alert("设置已保存")
+
+}
+
+function exportData(){
+
+ let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="ARTIST_AI_学习数据备份.json";a.click();URL.revokeObjectURL(url)
+
+}
+
+function importData(e){
+
+ let f=e.target.files[0];if(!f)return;
+
+ let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x||!Array.isArray(x.works)||!Array.isArray(x.homeworks)||!Array.isArray(x.records))throw Error();if(confirm("导入会替换当前学习数据，确定继续吗？")){data=x;persist();alert("数据恢复成功")}}catch(err){alert("文件格式不正确，无法导入")}};r.readAsText(f)
+
+}
+
+function escapeHtml(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+function init(){
+
+ document.getElementById("today").textContent=new Date().toLocaleDateString("zh-CN",{month:"long",day:"numeric"});
+
+ document.getElementById("recordDate").value=new Date().toISOString().slice(0,10);
+
+ initSelects();renderHome();renderCourseList();renderLesson();refresh();
+
+ if(data.settings.startDate)document.getElementById("startDate").value=data.settings.startDate;
+
+ if(data.settings.dailyGoal)document.getElementById("dailyGoal").value=data.settings.dailyGoal;
+
+ if(data.settings.longGoal)document.getElementById("longGoal").value=data.settings.longGoal;
+
+}
+
+init();
+
 </script>
+
 </body>
+
 </html>
