@@ -1,65 +1,624 @@
-const express = require("express");
-const path = require("path");
-require("dotenv").config?.();
 
-const app = express();
-app.use(express.json({ limit: "12mb" }));
-app.use(express.static(path.join(__dirname, "public")));
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ARTIST AI 4.0 | 角色绘画学院</title>
+<style>
+:root {
+  --bg:#f7f5f2; --card:#fff; --ink:#302d32;
+  --muted:#88818a; --purple:#8068a5; --soft:#eee8f5;
+  --line:#ebe6ed; --green:#658b75; --pink:#f5e9ec;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif}
+header{padding:30px 22px;background:linear-gradient(130deg,#eae3f2,#f5e9e9)}
+header small{color:var(--purple);letter-spacing:2px;font-weight:bold}
+header h1{font-size:29px;margin:12px 0 7px}
+header p{color:#77717b;line-height:1.7;margin:0}
+nav{display:flex;overflow-x:auto;gap:7px;padding:12px;
+background:white;position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line)}
+nav button{white-space:nowrap;border:0;background:#f3f0f5;color:#655c6d;
+padding:11px 14px;border-radius:20px}
+nav button.active{background:var(--purple);color:white}
+main{max-width:950px;margin:auto;padding:17px}
+.page{display:none}.page.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);
+border-radius:17px;padding:18px;margin-bottom:14px}
+h2{font-size:20px;margin:0 0 13px}
+h3{font-size:16px;margin:0 0 9px}
+p{line-height:1.65}
+.muted{color:var(--muted);font-size:13px;line-height:1.7}
+button,.btn{cursor:pointer;border:0;border-radius:11px;
+padding:11px 15px;background:var(--purple);color:white;font-weight:600}
+button:disabled{opacity:.5;cursor:not-allowed}
+.secondary{background:var(--soft);color:#655477}
+.danger{background:#f7e9e9;color:#a45b5b}
+input,textarea,select{width:100%;padding:12px;margin:6px 0 12px;
+border:1px solid var(--line);border-radius:10px;background:white;
+font:inherit;color:var(--ink)}
+textarea{min-height:100px;resize:vertical}
+label{font-size:13px;color:#77717b}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row>*{flex:1;min-width:120px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:#f7f3fa;border-radius:13px;padding:14px}
+.stat b{font-size:25px;display:block}
+.stat span{font-size:12px;color:var(--muted)}
+.progress{height:8px;background:#eee9ef;border-radius:20px;overflow:hidden}
+.progress span{display:block;height:100%;background:var(--green)}
+.item{padding:13px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border:0}
+.tag{display:inline-block;background:var(--soft);color:#6b5684;
+border-radius:20px;padding:4px 9px;font-size:11px;margin:3px}
+.task{display:flex;gap:10px;align-items:flex-start;padding:10px 0;
+border-bottom:1px solid var(--line)}
+.task input{width:auto;margin-top:5px}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:12px}
+.work{border:1px solid var(--line);border-radius:12px;padding:9px}
+.work img{width:100%;height:135px;object-fit:cover;border-radius:8px}
+.preview{max-width:100%;max-height:280px;object-fit:contain}
+.chat{height:300px;overflow:auto;background:#faf8fa;padding:12px;border-radius:12px;margin:10px 0}
+.bubble{padding:11px;border-radius:12px;margin:8px 0;white-space:pre-wrap;line-height:1.6}
+.me{background:var(--soft);margin-left:20px}
+.bot{background:white;border:1px solid var(--line);margin-right:20px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
+@media(max-width:500px){.stats{gap:6px}.stat{padding:10px}.stat b{font-size:21px}}
+</style>
+</head>
 
-const API_KEY = process.env.AI_API_KEY || "";
-const BASE_URL = (process.env.AI_BASE_URL || "https://api.openai.com/v1").replace(/\/$/, "");
-const MODEL = process.env.AI_MODEL || "gpt-4.1-mini";
+<body>
 
-app.get("/api/status", (_req, res) => {
-  res.json({ aiConfigured: Boolean(API_KEY), model: API_KEY ? MODEL : null });
+<header>
+<small>ARTIST AI · CHARACTER ART ACADEMY</small>
+<h1>成为你想成为的角色画师。</h1>
+<p>24周系统学习 · 男女角色 · 多种绘画风格<br>
+从临摹入门，到独立设计自己的角色。</p>
+</header>
+
+<nav id="nav">
+<button class="active" data-page="home">首页</button>
+<button data-page="course">课程中心</button>
+<button data-page="practice">智能练习</button>
+<button data-page="mentor">AI导师</button>
+<button data-page="portfolio">作品档案</button>
+<button data-page="compare">作品对比</button>
+<button data-page="memory">学习记忆</button>
+<button data-page="settings">数据设置</button>
+</nav>
+
+<main>
+
+<!-- 首页 -->
+<section class="page active" id="home">
+<div class="card">
+<h2>欢迎回来 ✨</h2>
+<p class="muted" id="date"></p>
+<h3 id="todayTask">今日人物绘画训练</h3>
+<p class="muted">每天建议学习3小时：基础训练60分钟、专项练习60分钟、独立创作60分钟。</p>
+<div class="progress"><span id="progress" style="width:0%"></span></div>
+<p class="muted" id="progressText">开始今天的训练吧。</p>
+<button id="checkin">完成今日打卡</button>
+</div>
+
+<div class="stats">
+<div class="stat"><b id="days">0</b><span>累计打卡</span></div>
+<div class="stat"><b id="works">0</b><span>作品数量</span></div>
+<div class="stat"><b id="level">1</b><span>训练等级</span></div>
+</div>
+
+<div class="card">
+<h2>本周学习内容</h2>
+<h3 id="weekTitle"></h3>
+<p class="muted" id="weekDescription"></p>
+</div>
+
+<div class="card">
+<h2>你的学习方向</h2>
+<span class="tag">男性角色</span>
+<span class="tag">女性角色</span>
+<span class="tag">动漫</span>
+<span class="tag">韩系</span>
+<span class="tag">半写实</span>
+<span class="tag">欧美</span>
+<p class="muted">男女角色均衡训练，不局限于一种风格。</p>
+</div>
+</section>
+
+<!-- 课程 -->
+<section class="page" id="course">
+<div class="card">
+<h2>24周完整课程</h2>
+<p class="muted">从基础造型到独立角色创作。</p>
+<div id="courses"></div>
+</div>
+</section>
+
+<!-- 练习 -->
+<section class="page" id="practice">
+<div class="card">
+<h2>智能练习生成器</h2>
+
+<label>训练角色</label>
+<select id="gender">
+<option>女性角色</option>
+<option>男性角色</option>
+<option>男女各一张</option>
+</select>
+
+<label>绘画风格</label>
+<select id="style">
+<option>动漫</option>
+<option>韩系</option>
+<option>半写实</option>
+<option>欧美</option>
+<option>自由混合</option>
+</select>
+
+<label>训练主题</label>
+<select id="topic">
+<option>头部与五官</option>
+<option>人体动态</option>
+<option>手部结构</option>
+<option>服装褶皱</option>
+<option>发型设计</option>
+<option>全身角色</option>
+<option>人物表情</option>
+<option>原创角色设计</option>
+</select>
+
+<label>训练难度</label>
+<select id="difficulty">
+<option value="1">基础</option>
+<option value="2">进阶</option>
+<option value="3">挑战</option>
+</select>
+
+<button id="generate">生成我的练习</button>
+<div id="exercise" class="item"></div>
+</div>
+
+<div class="card">
+<h2>角色参考观察题库</h2>
+<p class="muted">抽取一个具体观察任务，练习从参考图中理解人物结构。</p>
+<button class="secondary" id="randomQuestion">随机抽取练习题</button>
+<div id="question" class="item"></div>
+</div>
+</section>
+
+<!-- AI导师 -->
+<section class="page" id="mentor">
+<div class="card">
+<h2>AI绘画导师</h2>
+<p class="muted">真正的AI对话需要配置后端服务。目前这里不会用预设答案冒充AI。</p>
+<div id="aiStatus" class="tag">尚未连接AI服务</div>
+<div class="chat" id="chat">
+<div class="bubble bot">你好！我是你的角色绘画导师。你可以在这里记录想问的问题。连接AI后端后即可进行真正的智能对话。</div>
+</div>
+<textarea id="questionInput" placeholder="例如：为什么我画的头部总是不自然？"></textarea>
+<button id="sendQuestion">发送问题</button>
+</div>
+
+<div class="card">
+<h2>上传作品进行视觉分析</h2>
+<p class="muted">连接支持图片输入的AI后端后，才能真正识别和分析作品。</p>
+<input type="file" id="analysisFile" accept="image/*">
+<img id="analysisPreview" class="preview" hidden>
+<textarea id="analysisPrompt" placeholder="你希望重点分析什么？例如头部比例、人体结构、动态……"></textarea>
+<button id="analyze">请求视觉分析</button>
+<div id="analysisResult" class="muted"></div>
+</div>
+</section>
+
+<!-- 作品档案 -->
+<section class="page" id="portfolio">
+<div class="card">
+<h2>添加作品</h2>
+<label>作品名称</label>
+<input id="workName" placeholder="给作品取一个名字">
+
+<label>角色类型</label>
+<select id="workGender">
+<option>女性角色</option>
+<option>男性角色</option>
+</select>
+
+<label>绘画风格</label>
+<select id="workStyle">
+<option>动漫</option>
+<option>韩系</option>
+<option>半写实</option>
+<option>欧美</option>
+</select>
+
+<label>作品图片</label>
+<input type="file" id="workImage" accept="image/*">
+
+<label>创作心得</label>
+<textarea id="workNote" placeholder="记录这次的优点、问题和下一步计划"></textarea>
+
+<button id="saveWork">保存作品</button>
+</div>
+
+<div class="card">
+<h2>我的作品集</h2>
+<div class="gallery" id="gallery"></div>
+</div>
+
+<div class="card">
+<h2>能力评估</h2>
+<p class="muted">根据自己目前的真实水平进行评估，系统据此调整建议训练等级。</p>
+<div id="skills"></div>
+<button id="saveSkills" class="secondary">保存能力评估</button>
+</div>
+</section>
+
+<!-- 对比 -->
+<section class="page" id="compare">
+<div class="card">
+<h2>作品成长对比</h2>
+<p class="muted">至少保存两张作品，才能进行对比。</p>
+<label>选择作品A</label>
+<select id="compareA"></select>
+<div id="imageA"></div>
+
+<label>选择作品B</label>
+<select id="compareB"></select>
+<div id="imageB"></div>
+
+<label>成长记录</label>
+<textarea id="compareNote" placeholder="比例、结构、动态、线条方面有哪些进步？"></textarea>
+<button id="saveComparison">保存对比记录</button>
+<div id="comparisonHistory"></div>
+</div>
+</section>
+
+<!-- 学习记忆 -->
+<section class="page" id="memory">
+<div class="card">
+<h2>我的长期学习记忆</h2>
+<label>学习目标</label>
+<textarea id="memGoal"></textarea>
+
+<label>绘画偏好</label>
+<textarea id="memPreference"></textarea>
+
+<label>目前存在的问题</label>
+<textarea id="memProblem"></textarea>
+
+<label>阶段总结</label>
+<textarea id="memSummary"></textarea>
+
+<button id="saveMemory">保存学习记忆</button>
+</div>
+</section>
+
+<!-- 设置 -->
+<section class="page" id="settings">
+<div class="card">
+<h2>数据管理</h2>
+<p class="muted">导出备份可以保存你的打卡、课程进度、作品和学习记录。</p>
+<button id="export">导出全部数据</button>
+<label>导入以前的备份</label>
+<input type="file" id="import" accept=".json,application/json">
+</div>
+<div class="card">
+<h2>关于ARTIST AI</h2>
+<p class="muted">版本：4.0 单文件基础版</p>
+<p class="muted">本地数据保存在当前浏览器。更换设备或清理浏览器数据前，请先导出备份。</p>
+</div>
+</section>
+
+</main>
+
+<footer>ARTIST AI 4.0 · Character Art Academy</footer>
+
+<script>
+const KEY="artist_ai_4_complete";
+const blank={
+ checkins:[],works:[],level:1,
+ skills:{线条:1,人体结构:1,头部五官:1,动态:1,手部:1,服装:1,独立创作:1},
+ memory:{goal:"",preference:"",problem:"",summary:""},
+ comparisons:[],chat:[]
+};
+
+let data;
+try{
+ data={...blank,...JSON.parse(localStorage.getItem(KEY)||"{}")};
+}catch(e){data={...blank};}
+
+function save(){
+ try{
+  localStorage.setItem(KEY,JSON.stringify(data));
+ }catch(e){
+  alert("浏览器存储空间不足，请导出数据并压缩作品图片。");
+ }
+ render();
+}
+
+const courses=[
+["线条与形体","直线、曲线、椭圆、几何体、人物概括"],
+["观察与比例","头身比例、人体比例、动态轴线"],
+["人体基础","胸腔、骨盆、四肢体块"],
+["基础整合","临摹、观察、凭记忆重画"],
+["人体比例","不同体型、男女身体结构观察"],
+["动态训练","站姿、坐姿、行走、重心"],
+["躯干结构","胸腔、骨盆、脊柱关系"],
+["四肢关节","肩、肘、腕、髋、膝、踝"],
+["头部结构","头部球体、透视、仰视俯视"],
+["五官定位","眼、鼻、嘴、耳的比例"],
+["表情训练","人物情绪与微表情"],
+["发型设计","发块、发流、体积"],
+["手部结构","掌块、手指比例、手势"],
+["脚部训练","脚部结构、鞋型与透视"],
+["服装褶皱","布料、受力点、褶皱方向"],
+["全身整合","人体、姿态、服装组合"],
+["动漫风格","造型简化与风格表达"],
+["韩系半写实","柔和体积与五官"],
+["欧美风格","结构概括与夸张造型"],
+["风格转换","同一角色尝试不同风格"],
+["角色概念","人物性格与视觉关键词"],
+["服饰配色","配色、材质、服装设计"],
+["光影完成","明暗、色彩、画面整理"],
+["原创作品集","完成原创角色作品"]
+];
+
+const questions=[
+"找一张男性角色正面图，概括头部、胸腔和骨盆。",
+"找一张女性角色侧面图，观察肩线与骨盆倾斜。",
+"观察人物四分之三侧脸，画出头部中线。",
+"观察一只自然放松的手，先画手掌体块。",
+"观察宽松衣服，找出肩、肘、腰部的褶皱受力点。",
+"同一个角色分别尝试动漫、韩系、半写实三种画法。",
+"观察人物走路姿势，画动作线和支撑脚。",
+"设计两个不同性格的角色，只用剪影表现。",
+"画一张男性角色和一张女性角色的相同动态。",
+"观察不同角度的人脸，练习五官透视。"
+];
+
+const $=id=>document.getElementById(id);
+const today=()=>new Date().toLocaleDateString("sv-SE");
+const escapeHTML=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function currentWeek(){
+ const start=new Date("2027-01-15T00:00:00");
+ return Math.max(1,Math.min(24,Math.ceil((Date.now()-start.getTime()+86400000)/604800000)));
+}
+
+function render(){
+ const week=currentWeek();
+ $("date").textContent=today()+" · 第 "+week+" 周";
+ $("days").textContent=data.checkins.length;
+ $("works").textContent=data.works.length;
+ $("level").textContent=data.level;
+ $("progress").style.width=Math.min(100,data.checkins.length/168*100)+"%";
+ $("progressText").textContent="累计打卡 "+data.checkins.length+" 天";
+ $("weekTitle").textContent="第 "+week+" 周："+courses[week-1][0];
+ $("weekDescription").textContent=courses[week-1][1];
+ const done=data.checkins.includes(today());
+ $("checkin").disabled=done;
+ $("checkin").textContent=done?"今日已经完成打卡":"完成今日打卡";
+ $("todayTask").textContent=done?"今天的训练已完成":"今天也来画画吧！";
+
+ $("courses").innerHTML=courses.map((c,i)=>`
+ <div class="item">
+ <b>第${i+1}周 · ${c[0]}</b>
+ <p class="muted">${c[1]}</p>
+ <span class="tag">${i<4?"基础阶段":i<8?"人体阶段":i<16?"专项阶段":i<20?"风格阶段":"创作阶段"}</span>
+ </div>`).join("");
+
+ $("gallery").innerHTML=data.works.map((w,i)=>`
+ <div class="work">
+ <img src="${w.image}" alt="">
+ <b>${escapeHTML(w.name)}</b>
+ <p class="muted">${escapeHTML(w.gender)} · ${escapeHTML(w.style)}</p>
+ <p class="muted">${escapeHTML(w.date)}</p>
+ <p class="muted">${escapeHTML(w.note)}</p>
+ <button class="danger" onclick="deleteWork(${i})">删除</button>
+ </div>`).join("")||'<p class="muted">还没有作品，上传你的第一张练习吧。</p>';
+
+ $("skills").innerHTML=Object.entries(data.skills).map(([k,v])=>`
+ <label>${k}：<b>${v}/5</b>
+ <input type="range" min="1" max="5" value="${v}" data-skill="${k}">
+ </label>`).join("");
+
+ $("memGoal").value=data.memory.goal||"";
+ $("memPreference").value=data.memory.preference||"";
+ $("memProblem").value=data.memory.problem||"";
+ $("memSummary").value=data.memory.summary||"";
+
+ fillCompare();
+}
+
+function showPage(id){
+ document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));
+ document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
+}
+
+$("nav").addEventListener("click",e=>{
+ const b=e.target.closest("[data-page]");
+ if(b)showPage(b.dataset.page);
 });
 
-app.post("/api/chat", async (req, res) => {
-  if (!API_KEY) return res.status(503).json({ error: "AI_NOT_CONFIGURED", message: "尚未配置 AI_API_KEY。课程、档案等本地功能仍可使用。" });
-  try {
-    const { messages = [], memory = "" } = req.body || {};
-    const system = `你是 ARTIST AI，一位严谨、温柔、科学的角色绘画导师。只教人物/角色绘画，男女角色训练同等重要，覆盖动漫、韩系、半写实、欧美等风格。用户目前可能会临摹但不擅长独立创作。回答要具体、可执行、分步骤；批改时区分观察到的事实与不确定推测，不要假装看到了未提供的图片。长期学习记录：${String(memory).slice(0,5000)}`;
-    const r = await fetch(`${BASE_URL}/chat/completions`, {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: MODEL, messages: [{ role: "system", content: system }, ...messages].slice(-24), temperature: 0.7 })
-    });
-    const data = await r.json();
-    if (!r.ok) return res.status(r.status).json({ error: "PROVIDER_ERROR", message: data.error?.message || "AI 服务请求失败" });
-    res.json({ reply: data.choices?.[0]?.message?.content || "暂时没有收到回复。" });
-  } catch (e) {
-    res.status(500).json({ error: "SERVER_ERROR", message: e.message });
-  }
-});
+$("checkin").onclick=()=>{
+ if(!data.checkins.includes(today()))data.checkins.push(today());
+ save();
+};
 
-app.post("/api/vision", async (req, res) => {
-  if (!API_KEY) return res.status(503).json({ error: "AI_NOT_CONFIGURED", message: "尚未配置 AI_API_KEY，暂时无法进行真正的视觉分析。" });
-  try {
-    const { image, prompt = "请分析这张人物绘画练习。" } = req.body || {};
-    if (!image || !/^data:image\/(png|jpeg|webp);base64,/.test(image)) {
-      return res.status(400).json({ error: "INVALID_IMAGE", message: "请上传 PNG、JPG 或 WEBP 图片。" });
-    }
-    const userPrompt = `${prompt}\n请按以下结构反馈：1.能从图中确认的优点；2.最重要的三个可改进点；3.具体修改方法；4.一个针对性练习。不要猜测图片中无法确认的内容。`;
-    const r = await fetch(`${BASE_URL}/chat/completions`, {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [
-          { role: "system", content: "你是专业人物绘画导师。只根据图像中实际可见内容进行分析，坦诚说明不确定之处，不要捏造细节。" },
-          { role: "user", content: [{ type: "text", text: userPrompt }, { type: "image_url", image_url: { url: image } }] }
-        ],
-        temperature: 0.4
-      })
-    });
-    const data = await r.json();
-    if (!r.ok) return res.status(r.status).json({ error: "PROVIDER_ERROR", message: data.error?.message || "视觉分析请求失败" });
-    res.json({ analysis: data.choices?.[0]?.message?.content || "暂时没有收到分析。" });
-  } catch (e) {
-    res.status(500).json({ error: "SERVER_ERROR", message: e.message });
-  }
-});
+$("generate").onclick=()=>{
+ const gender=$("gender").value;
+ const style=$("style").value;
+ const topic=$("topic").value;
+ const level=+$("difficulty").value;
+ const details=[
+ "先观察整体轮廓，分析比例和方向。",
+ "用简单几何形概括主要结构。",
+ "关闭参考图，凭记忆独立重画。",
+ "对照参考，标出最明显的两个差异。"
+ ];
+ const difficultyText=[
+ "基础：先保证大形和比例，不追求细节。",
+ "进阶：加入透视变化、结构连接和线条。",
+ "挑战：加入动态、设计选择和风格表达。"
+ ];
+ $("exercise").innerHTML=`
+ <h3>你的专属练习</h3>
+ <span class="tag">${gender}</span><span class="tag">${style}</span>
+ <span class="tag">${topic}</span>
+ <p>${details.join("<br>")}</p>
+ <p><b>${difficultyText[level-1]}</b></p>
+ <p class="muted">建议用时：60分钟。额外挑战：换另一种性别角色再画一遍。</p>
+ <button onclick="copyExercise()">复制练习内容</button>`;
+ window.currentExercise=`${gender} ${style} ${topic}\n${details.join("\n")}\n${difficultyText[level-1]}`;
+};
 
-app.get("*", (_req, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`ARTIST AI 4.0 running at http://localhost:${port}`));
+window.copyExercise=()=>{
+ if(navigator.clipboard){
+ navigator.clipboard.writeText(window.currentExercise).then(()=>alert("练习已复制"));
+ }else alert(window.currentExercise);
+};
+
+$("randomQuestion").onclick=()=>{
+ $("question").textContent=questions[Math.floor(Math.random()*questions.length)];
+};
+
+$("saveWork").onclick=()=>{
+ const file=$("workImage").files[0];
+ if(!file){alert("请先选择作品图片");return;}
+ if(file.size>1500000){alert("图片太大，请压缩到1.5MB以内再上传。");return;}
+ const reader=new FileReader();
+ reader.onload=()=>{
+  data.works.push({
+   name:$("workName").value||"未命名作品",
+   gender:$("workGender").value,
+   style:$("workStyle").value,
+   note:$("workNote").value,
+   image:reader.result,
+   date:today()
+  });
+  $("workName").value="";
+  $("workNote").value="";
+  $("workImage").value="";
+  save();
+  alert("作品保存成功！");
+ };
+ reader.readAsDataURL(file);
+};
+
+window.deleteWork=i=>{
+ if(confirm("确定删除这张作品吗？")){
+ data.works.splice(i,1);
+ save();
+ }
+};
+
+$("saveSkills").onclick=()=>{
+ document.querySelectorAll("[data-skill]").forEach(el=>{
+  data.skills[el.dataset.skill]=+el.value;
+ });
+ const avg=Object.values(data.skills).reduce((a,b)=>a+b,0)/Object.keys(data.skills).length;
+ data.level=avg<2.3?1:avg<3.8?2:3;
+ save();
+ alert("能力评估已保存，建议训练等级："+data.level);
+};
+
+function fillCompare(){
+ const opts=data.works.map((w,i)=>`<option value="${i}">${escapeHTML(w.name)} · ${w.date}</option>`).join("");
+ $("compareA").innerHTML=opts;
+ $("compareB").innerHTML=opts;
+ if(data.works.length>1)$("compareB").value=1;
+ renderCompare();
+ $("comparisonHistory").innerHTML=data.comparisons.map(c=>`
+ <div class="item"><b>${c.date}</b><p>${escapeHTML(c.note)}</p></div>`).join("");
+}
+
+function renderCompare(){
+ ["A","B"].forEach(k=>{
+  const i=+$("compare"+k).value;
+  const w=data.works[i];
+  $("image"+k).innerHTML=w?
+  `<img class="preview" src="${w.image}"><p class="muted">${escapeHTML(w.name)}</p>`:
+  '<p class="muted">请先保存作品。</p>';
+ });
+}
+
+$("compareA").onchange=renderCompare;
+$("compareB").onchange=renderCompare;
+
+$("saveComparison").onclick=()=>{
+ if(data.works.length<2){alert("至少需要两张作品才能进行对比。");return;}
+ const note=$("compareNote").value.trim();
+ if(!note){alert("请先填写对比心得。");return;}
+ data.comparisons.push({date:today(),note});
+ $("compareNote").value="";
+ save();
+ alert("对比记录已保存！");
+};
+
+$("saveMemory").onclick=()=>{
+ data.memory={
+ goal:$("memGoal").value,
+ preference:$("memPreference").value,
+ problem:$("memProblem").value,
+ summary:$("memSummary").value
+ };
+ save();
+ alert("学习记忆保存成功！");
+};
+
+$("sendQuestion").onclick=()=>{
+ const q=$("questionInput").value.trim();
+ if(!q)return;
+ $("chat").innerHTML+=`<div class="bubble me">${escapeHTML(q)}</div>
+ <div class="bubble bot">目前尚未连接真正的AI服务，所以我还不能生成智能回答。你的问题可以先记录下来；连接后端后即可让AI导师分析。</div>`;
+ $("questionInput").value="";
+ $("chat").scrollTop=$("chat").scrollHeight;
+};
+
+let analysisImage="";
+$("analysisFile").onchange=e=>{
+ const f=e.target.files[0];
+ if(!f)return;
+ if(f.size>5000000){alert("图片请控制在5MB以内");return;}
+ const reader=new FileReader();
+ reader.onload=()=>{
+  analysisImage=reader.result;
+  $("analysisPreview").src=analysisImage;
+  $("analysisPreview").hidden=false;
+ };
+ reader.readAsDataURL(f);
+};
+
+$("analyze").onclick=()=>{
+ if(!analysisImage){alert("请先上传作品");return;}
+ $("analysisResult").textContent="图片已选择，但真正的视觉分析需要连接支持图像输入的AI后端。当前不会伪造分析结果。";
+};
+
+$("export").onclick=()=>{
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+ a.href=url;a.download="ARTIST_AI_学习备份.json";a.click();
+ URL.revokeObjectURL(url);
+};
+
+$("import").onchange=async e=>{
+ const f=e.target.files[0];
+ if(!f)return;
+ try{
+  const d=JSON.parse(await f.text());
+  if(!Array.isArray(d.checkins)||!Array.isArray(d.works))throw Error();
+  data={...blank,...d};
+  save();
+  alert("数据恢复成功！");
+ }catch(err){
+  alert("备份文件格式错误，无法导入。");
+ }
+};
+
+render();
+</script>
+</body>
+</html>
