@@ -10,109 +10,103 @@
 
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>ARTIST AI · 角色绘画学院</title>
+<title>ARTIST AI｜私人绘画老师</title>
 
 <style>
 
-:root{--bg:#f6f5f2;--paper:#fff;--ink:#292925;--muted:#898982;--line:#e9e7e1;--accent:#8d806d;--soft:#eeeae3;--green:#687b69}
+:root{--bg:#f5f2ec;--paper:#fffefa;--ink:#292820;--muted:#817d72;--line:#e8e2d8;--accent:#927d65}
 
 *{box-sizing:border-box}
 
-body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif}
 
 button,input,textarea,select{font:inherit}
 
 button{cursor:pointer}
 
-header{padding:25px 6%;display:flex;justify-content:space-between;align-items:center;background:#fff;border-bottom:1px solid var(--line)}
+header{padding:18px 5%;background:white;border-bottom:1px solid var(--line)}
 
-.logo{font-family:Georgia,serif;font-size:25px;letter-spacing:2px}
+.logo{font:25px Georgia,serif;letter-spacing:2px}
 
-.logo small{display:block;font:10px Arial;letter-spacing:3px;color:var(--muted);margin-top:5px}
+.logo small{display:block;font:10px Arial;color:var(--muted)}
 
-header span{font-size:12px;color:var(--muted)}
+nav{display:flex;gap:7px;padding:12px 5%;background:white;overflow:auto}
 
-nav{display:flex;gap:8px;padding:13px 6%;background:#fff;overflow:auto;border-bottom:1px solid var(--line)}
+nav button{border:0;background:transparent;padding:10px 14px;border-radius:20px;white-space:nowrap}
 
-nav button{white-space:nowrap;border:0;background:transparent;padding:10px 15px;color:#777;border-radius:20px}
+nav button.active{background:#292820;color:white}
 
-nav button.active{background:var(--ink);color:white}
+main{max-width:1100px;margin:25px auto;padding:0 18px 60px}
 
-main{max-width:1100px;margin:32px auto;padding:0 22px 70px}
+.page{display:none}.page.active{display:block}
 
-.hero{padding:38px;border-radius:18px;background:#e9e5dd;display:grid;grid-template-columns:1.5fr 1fr;gap:20px;align-items:center}
+.hero{padding:30px;border-radius:17px;background:#e9e2d7;display:grid;grid-template-columns:1.4fr 1fr;gap:20px}
 
-.eyebrow{font-size:11px;letter-spacing:3px;color:var(--accent)}
+h1{font:400 38px Georgia,serif}
 
-h1{font-family:Georgia,serif;font-weight:400;font-size:38px;margin:15px 0}
+h2{font:400 27px Georgia,serif}
 
-.hero p{line-height:1.9;color:#68665f}
+p{line-height:1.9}
 
-.hero-art{height:180px;border-radius:12px;background:linear-gradient(145deg,#c9c1b3,#eee9e0);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:76px;color:#827867}
+.muted{color:var(--muted);font-size:13px}
 
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:20px 0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
 
-.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:22px}
+.card{background:white;border:1px solid var(--line);border-radius:13px;padding:18px;margin-bottom:13px}
 
-.card h3{font-weight:500;margin:8px 0 12px}
+.btn{border:0;border-radius:8px;background:#292820;color:white;padding:12px 17px}
 
-.muted{color:var(--muted);font-size:13px;line-height:1.8}
+.light{background:#eee8df;color:#292820}
 
-.big{font-family:Georgia,serif;font-size:32px}
+input,textarea,select{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;margin:7px 0 13px}
 
-.section-title{font-family:Georgia,serif;font-size:26px;font-weight:400;margin:35px 0 15px}
+textarea{min-height:90px}
 
-.btn{border:0;border-radius:8px;background:var(--ink);color:white;padding:12px 19px}
+.row{display:flex;gap:9px;flex-wrap:wrap}
 
-.btn.light{background:var(--soft);color:var(--ink)}
+.chatbox{background:white;border:1px solid var(--line);border-radius:15px;overflow:hidden}
 
-.btn.small{padding:8px 12px;font-size:13px}
+.messages{padding:15px;min-height:300px;max-height:450px;overflow:auto}
 
-.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.bubble{padding:13px;border-radius:12px;margin:10px 0;white-space:pre-wrap;line-height:1.8}
 
-.progress{height:6px;background:#eceae5;border-radius:9px;overflow:hidden;margin:12px 0}
+.ai{background:#f0ede7}.user{background:#e8eee8;margin-left:12%}
 
-.progress i{display:block;height:100%;background:var(--green)}
+.compose{padding:15px;border-top:1px solid var(--line)}
 
-.lesson{display:grid;grid-template-columns:220px 1fr;gap:18px}
+.preview{max-width:100%;max-height:220px;object-fit:contain}
 
-.lesson-menu button{display:block;width:100%;text-align:left;background:white;border:1px solid var(--line);padding:14px;margin-bottom:8px;border-radius:9px;color:#666}
+.lesson-layout{display:grid;grid-template-columns:210px 1fr;gap:14px}
 
-.lesson-menu button.active{border-color:var(--accent);color:var(--ink);background:#f0ede7}
+.lesson-menu button{display:block;width:100%;text-align:left;padding:12px;margin-bottom:7px;background:white;border:1px solid var(--line);border-radius:8px}
 
-.lesson-body{background:white;border:1px solid var(--line);border-radius:14px;padding:26px;min-width:0}
+.lesson-menu button.active{background:#eee8df}
 
-.lesson-body h2{font-weight:500;font-size:25px}
+.lesson-content{background:white;border-radius:13px;padding:22px}
 
-.lesson-body h3{font-size:17px;margin-top:28px}
+.step{background:#f4f1eb;padding:14px;border-radius:9px;margin:10px 0}
 
-.lesson-body p,.lesson-body li{line-height:1.95;color:#555}
+.work-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 
-.step{padding:15px 17px;background:#f7f6f3;border-radius:9px;margin:12px 0}
+.work-grid img{width:100%;height:170px;object-fit:contain}
 
-.step b{display:block;margin-bottom:7px;color:#444}
+.notice{background:#f5eee2;padding:13px;border-radius:9px;font-size:13px;line-height:1.8}
 
-.reference{width:100%;max-height:390px;object-fit:contain;background:#f5f4f1;border-radius:10px;margin:10px 0}
+@media(max-width:700px){
 
-input,textarea,select{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;background:#fff;margin:7px 0 13px;color:#333}
+.hero{grid-template-columns:1fr}
 
-textarea{min-height:100px;resize:vertical}
+.grid{grid-template-columns:1fr 1fr}
 
-label{font-size:13px;color:#666}
+.lesson-layout{grid-template-columns:1fr}
 
-.task{border:1px solid var(--line);border-radius:10px;padding:15px;margin:10px 0}
+.lesson-menu{display:flex;overflow:auto;gap:7px}
 
-.task input[type=checkbox]{width:auto;margin-right:8px}
+.lesson-menu button{min-width:140px}
 
-.work{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.work-grid{grid-template-columns:1fr 1fr}
 
-.work img{width:100%;height:180px;object-fit:contain;background:#f1f0ed;border-radius:8px}
-
-.hidden{display:none!important}
-
-footer{text-align:center;padding:30px;color:#aaa;font-size:12px}
-
-@media(max-width:700px){.hero{grid-template-columns:1fr;padding:25px}.hero-art{height:110px}.grid{grid-template-columns:1fr 1fr}.lesson{grid-template-columns:1fr}.lesson-menu{display:flex;overflow:auto;gap:7px}.lesson-menu button{min-width:130px}.work{grid-template-columns:1fr 1fr}h1{font-size:30px}}
+}
 
 </style>
 
@@ -120,17 +114,13 @@ footer{text-align:center;padding:30px;color:#aaa;font-size:12px}
 
 <body>
 
-<header>
+<header><div class="logo">ARTIST AI<small>YOUR PERSONAL ART TEACHER</small></div></header>
 
-<div class="logo">ARTIST AI<small>CHARACTER ART ACADEMY</small></div>
-
-<span>YOUR PERSONAL ART SCHOOL</span>
-
-</header>
-
-<nav id="nav">
+<nav>
 
 <button class="active" data-page="home">学习首页</button>
+
+<button data-page="tutor">AI 绘画老师</button>
 
 <button data-page="course">系统课程</button>
 
@@ -144,479 +134,293 @@ footer{text-align:center;padding:30px;color:#aaa;font-size:12px}
 
 <main>
 
-<section id="home">
+<section id="home" class="page active">
 
 <div class="hero">
 
 <div>
 
-<div class="eyebrow">A STRUCTURED ART JOURNEY</div>
+<p class="muted">A PERSONAL ART JOURNEY</p>
 
 <h1>从临摹，到真正会画。</h1>
 
-<p>一套围绕人物角色创作设计的系统训练。学习结构、比例、动态、人体、头部、服装与风格，而不是只看教程、只记知识点。</p>
+<p>你的私人角色绘画学院。学习人体、动态、头部、五官、手脚、服装和多种绘画风格。</p>
 
-<div class="row"><button class="btn" onclick="showPage('course')">继续学习</button><button class="btn light" onclick="showPage('practice')">开始今日训练</button></div>
+<div class="row">
+
+<button class="btn" onclick="showPage('tutor')">进入 AI 画室</button>
+
+<button class="btn light" onclick="showPage('course')">开始课程</button>
 
 </div>
 
-<div class="hero-art">A</div>
+</div>
+
+<div style="display:grid;place-items:center;font:90px Georgia;color:#897965">A</div>
 
 </div>
+
+<div class="grid" style="margin-top:15px">
+
+<div class="card"><p class="muted">课程完成</p><h2 id="progressText">0 / 24</h2></div>
+
+<div class="card"><p class="muted">每日训练</p><h2>3 小时</h2></div>
+
+<div class="card"><p class="muted">学习目标</p><h2>独立创作</h2></div>
+
+</div>
+
+<h2>24 周学习路线</h2>
 
 <div class="grid">
 
-<div class="card"><div class="muted">课程进度</div><div class="big" id="progressText">0 / 24</div><div class="progress"><i id="progressBar" style="width:0%"></i></div><div class="muted">周课程已完成</div></div>
+<div class="card"><h3>01—04 造型基础</h3><p class="muted">线条、几何体、比例、观察。</p></div>
 
-<div class="card"><div class="muted">学习目标</div><div class="big">24 周</div><div class="muted">建立独立角色创作能力</div></div>
+<div class="card"><h3>05—08 人体结构</h3><p class="muted">人体动态、躯干、四肢。</p></div>
 
-<div class="card"><div class="muted">每日建议</div><div class="big">3 小时</div><div class="muted">观察、理解、练习、复盘</div></div>
+<div class="card"><h3>09—12 头部五官</h3><p class="muted">头部结构、表情、发型。</p></div>
 
-</div>
+<div class="card"><h3>13—16 细节整合</h3><p class="muted">手脚、服装、褶皱。</p></div>
 
-<h2 class="section-title">你的学习路线</h2>
+<div class="card"><h3>17—20 风格训练</h3><p class="muted">动漫、韩系、半写实、欧美。</p></div>
 
-<div class="grid">
-
-<div class="card"><div class="eyebrow">01 — 04 WEEKS</div><h3>造型基础</h3><p class="muted">线条、几何形体、比例、观察与概括。</p></div>
-
-<div class="card"><div class="eyebrow">05 — 08 WEEKS</div><h3>人体结构</h3><p class="muted">人体比例、动态线、躯干、四肢与关节。</p></div>
-
-<div class="card"><div class="eyebrow">09 — 12 WEEKS</div><h3>头部与表情</h3><p class="muted">头部结构、五官定位、表情和发型。</p></div>
-
-<div class="card"><div class="eyebrow">13 — 16 WEEKS</div><h3>细节整合</h3><p class="muted">手脚、服装褶皱、人体完整度。</p></div>
-
-<div class="card"><div class="eyebrow">17 — 20 WEEKS</div><h3>风格训练</h3><p class="muted">动漫、韩系、半写实、欧美风格。</p></div>
-
-<div class="card"><div class="eyebrow">21 — 24 WEEKS</div><h3>原创创作</h3><p class="muted">角色设计、配色、光影和作品集。</p></div>
-
-</div>
-
-<h2 class="section-title">今天应该怎么学？</h2>
-
-<div class="card">
-
-<p>不要一开始就追求画出完整漂亮的人物。先训练你能不能看懂形体、比例和结构。</p>
-
-<p class="muted">今天的建议：观察 20 分钟 → 理解知识 40 分钟 → 临摹分析 40 分钟 → 独立练习 60 分钟 → 复盘 20 分钟。</p>
-
-<button class="btn" onclick="openLesson(0)">进入第一课</button>
+<div class="card"><h3>21—24 原创创作</h3><p class="muted">角色设计、配色、光影。</p></div>
 
 </div>
 
 </section>
 
-<section id="course" class="hidden">
+<section id="tutor" class="page">
 
-<div class="eyebrow">CURRICULUM</div>
+<h1>AI 绘画老师</h1>
+
+<p class="muted">可以提问，也可以上传你的画，让老师分析。</p>
+
+<div class="chatbox">
+
+<div class="messages" id="messages">
+
+<div class="bubble ai">你好！我是你的私人角色绘画老师。你可以问我任何人物绘画问题，也可以上传作品让我批改。</div>
+
+</div>
+
+<div class="compose">
+
+<label>上传作品图片</label>
+
+<input type="file" id="imageInput" accept="image/png,image/jpeg,image/webp">
+
+<div id="preview"></div>
+
+<label>告诉老师你遇到的问题</label>
+
+<textarea id="question" placeholder="例如：我画的侧脸为什么不自然？"></textarea>
+
+<div class="row">
+
+<button class="btn" onclick="sendMessage()">发送</button>
+
+<button class="btn light" onclick="clearChat()">清空对话</button>
+
+</div>
+
+<p id="status" class="muted">AI 服务需要部署后端后才能使用。</p>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>AI 服务设置</h3>
+
+<label>Vercel 后端地址</label>
+
+<input id="apiUrl" placeholder="https://你的项目.vercel.app">
+
+<button class="btn" onclick="saveApiUrl()">保存地址</button>
+
+<p class="muted">这里只填写后端域名。API Key 必须保存在后端环境变量中，不要放在网页里。</p>
+
+</div>
+
+</section>
+
+<section id="course" class="page">
 
 <h1>系统课程</h1>
 
-<p class="muted">每一课都包含学习目标、原理解释、观察方法、步骤、练习和检查标准。</p>
-
-<div class="lesson">
+<div class="lesson-layout">
 
 <div class="lesson-menu" id="lessonMenu"></div>
 
-<div class="lesson-body" id="lessonBody"></div>
+<div class="lesson-content" id="lessonContent"></div>
 
 </div>
 
 </section>
 
-<section id="practice" class="hidden">
+<section id="practice" class="page">
 
-<div class="eyebrow">DAILY STUDIO</div><h1>今日训练</h1>
+<h1>今日训练</h1>
 
 <div class="card">
 
-<h3>三小时训练计划</h3>
+<h3>三小时训练安排</h3>
 
-<div class="task"><b>第一阶段 · 观察 20 分钟</b><p class="muted">找一张人物参考图，先不要画。观察头、胸腔、骨盆、四肢的方向和比例。</p></div>
+<div class="step">20 分钟：观察人物参考图。</div>
 
-<div class="task"><b>第二阶段 · 理解 40 分钟</b><p class="muted">阅读当前课程，尝试用自己的话解释今天的结构知识。</p></div>
+<div class="step">40 分钟：理解人体结构。</div>
 
-<div class="task"><b>第三阶段 · 分析临摹 40 分钟</b><p class="muted">先用简单形体概括人物，再对照参考图检查。</p></div>
+<div class="step">40 分钟：分析临摹。</div>
 
-<div class="task"><b>第四阶段 · 独立练习 60 分钟</b><p class="muted">关闭参考图，凭记忆重新画一次，再打开参考图找出差异。</p></div>
+<div class="step">60 分钟：独立练习。</div>
 
-<div class="task"><b>第五阶段 · 复盘 20 分钟</b><p class="muted">记录三个问题：哪里画错了？为什么错？下一次怎么改？</p></div>
+<div class="step">20 分钟：复盘并上传 AI 批改。</div>
 
 </div>
 
-<h2 class="section-title">生成练习题</h2>
-
 <div class="card">
 
-<label>角色类型</label><select id="gender"><option>女性角色</option><option>男性角色</option></select>
+<h3>生成练习题</h3>
 
-<label>训练方向</label><select id="topic"><option>人体比例</option><option>动态姿势</option><option>头部结构</option><option>五官定位</option><option>手部结构</option><option>服装褶皱</option></select>
+<label>角色</label>
 
-<label>难度</label><select id="level"><option>基础</option><option>进阶</option><option>挑战</option></select>
+<select id="gender"><option>女性角色</option><option>男性角色</option></select>
+
+<label>训练内容</label>
+
+<select id="topic">
+
+<option>人体比例</option><option>动态姿势</option>
+
+<option>头部结构</option><option>五官定位</option>
+
+<option>手部结构</option><option>服装褶皱</option>
+
+</select>
+
+<label>难度</label>
+
+<select id="level"><option>基础</option><option>进阶</option><option>挑战</option></select>
 
 <button class="btn" onclick="makeTask()">生成练习</button>
 
-<div id="taskResult" class="step hidden"></div>
+<div id="taskResult" class="step"></div>
 
 </div>
 
 </section>
 
-<section id="works" class="hidden">
+<section id="works" class="page">
 
-<div class="eyebrow">PORTFOLIO</div><h1>作品档案</h1>
+<h1>作品档案</h1>
 
 <div class="card">
 
-<h3>上传你的练习作品</h3>
+<label>作品名称</label><input id="workName">
 
-<label>作品名称</label><input id="workName" placeholder="例如：正面头部结构练习">
+<label>练习主题</label><input id="workTopic">
 
-<label>练习内容</label><input id="workTopic" placeholder="例如：头部比例">
+<label>上传作品</label><input type="file" id="workFile" accept="image/*">
 
-<label>上传图片</label><input type="file" id="workFile" accept="image/*">
-
-<label>本次复盘：你发现了什么问题？</label><textarea id="workNote" placeholder="例如：眼睛位置偏高，头部侧面转折不清楚……"></textarea>
+<label>复盘</label><textarea id="workNote"></textarea>
 
 <button class="btn" onclick="saveWork()">保存作品</button>
 
-<p class="muted">作品保存在当前浏览器中。请定期导出备份，避免清理浏览器数据后丢失。</p>
-
 </div>
 
-<h2 class="section-title">我的作品</h2><div id="workList" class="work"></div>
+<div id="workList" class="work-grid"></div>
 
 </section>
 
-<section id="record" class="hidden">
+<section id="record" class="page">
 
-<div class="eyebrow">LEARNING JOURNAL</div><h1>学习记录</h1>
+<h1>学习记录</h1>
 
 <div class="card">
 
-<h3>今日复盘</h3>
-
 <label>今天学了什么？</label><textarea id="recordLearn"></textarea>
 
-<label>我最明显的问题</label><textarea id="recordProblem"></textarea>
+<label>发现的问题</label><textarea id="recordProblem"></textarea>
 
-<label>下一次要改进什么？</label><textarea id="recordNext"></textarea>
+<label>下一次改进</label><textarea id="recordNext"></textarea>
 
 <button class="btn" onclick="saveRecord()">保存记录</button>
 
 </div>
 
-<h2 class="section-title">历史记录</h2><div id="recordList"></div>
+<div id="recordList"></div>
 
-<div class="card">
-
-<h3>数据备份</h3><p class="muted">导出学习记录和作品信息，保存到自己的设备。</p>
-
-<button class="btn light" onclick="exportData()">导出数据</button>
-
-</div>
+<button class="btn light" onclick="exportData()">导出学习数据</button>
 
 </section>
 
 </main>
 
-<footer>ARTIST AI · CHARACTER ART ACADEMY · LEARN TO SEE, LEARN TO DRAW.</footer>
-
 <script>
 
-const lessons=[
+let API_URL=localStorage.getItem("artist_api_url")||"";
 
-{
-
-title:"第 1 课｜学会观察人物",
-
-goal:"建立从整体到局部的观察顺序，不再一上来就画眼睛、头发和衣服。",
-
-why:"绘画不是把看到的轮廓机械地描下来，而是把三维形体转化成二维画面。初学者常见的问题是过早进入细节，导致整体比例和姿势失控。",
-
-steps:[
-
-["第一步：先看整体外轮廓","观察人物最高点、最低点、最左点和最右点。用一个简单的大框概括人物占据的画面范围。"],
-
-["第二步：找身体的主要块面","把头看作球体，胸腔看作椭圆体，骨盆看作倾斜的盒状体。四肢先用线和简单圆柱表示。"],
-
-["第三步：找方向","观察头部朝向、肩线倾斜、骨盆倾斜、脊柱的大致弯曲方向。"],
-
-["第四步：检查比例","比较头部与身体整体高度、肩宽与头宽、手部与脸部大小等关系。不要死记一个比例，要以参考人物为准。"]
-
-],
-
-mistakes:["一开始就画眼睛和头发。","只看局部，不看人物整体。","把肩线和骨盆线画成水平线，忽略姿势倾斜。"],
-
-exercise:"找一张站姿人物照片。只用 10 分钟画出外框、头部、胸腔、骨盆和四肢方向。禁止画五官、头发和衣服细节。然后再画第二遍。",
-
-check:["人物整体高度和宽度是否接近参考图？","头、胸腔、骨盆是否有明确位置？","肩线和骨盆线是否体现了倾斜？","不看细节时，是否还能看出人物的姿势？"],
-
-reference:"https://commons.wikimedia.org/wiki/Special:FilePath/Andrew_Loomis,_Figure_Drawing_for_All_It%27s_Worth.pdf",
-
-source:"Andrew Loomis，《Figure Drawing for All It's Worth》，人体造型与整体概括训练参考。"
-
-},
-
-{
-
-title:"第 2 课｜线条与形体",
-
-goal:"理解线条的方向、轻重和形体的空间关系。",
-
-why:"线条不只是轮廓装饰。它可以表示方向、结构、体积和动作。把复杂人物拆成简单形体，可以降低起稿难度。",
-
-steps:[
-
-["第一步：练习直线","画横线、竖线、斜线，每条线尽量一笔完成。先练稳定和方向，不追求速度。"],
-
-["第二步：练习椭圆","画不同方向的椭圆，注意长轴方向。椭圆的倾斜可以帮助理解胸腔和骨盆的朝向。"],
-
-["第三步：练习盒子","画正方体和长方体，理解前面、侧面和顶面的方向差异。"],
-
-["第四步：把形体放进人体","头部用球体概括，胸腔用椭圆体，骨盆用盒体，四肢用圆柱体。"]
-
-],
-
-mistakes:["线条反复描很多遍。","所有椭圆都画成同一个方向。","把圆柱画成没有体积的平行线。"],
-
-exercise:"每天画 20 条直线、20 个椭圆、10 个盒子、10 组圆柱。最后用这些形体搭建一个简单站姿人物。",
-
-check:["线条是否有明确起止方向？","椭圆是否能表达不同朝向？","盒子是否具有空间感？","人体各块形体是否连接合理？"],
-
-reference:"https://commons.wikimedia.org/wiki/Special:FilePath/Proportions_of_the_head.jpg",
-
-source:"Wikimedia Commons 人体头部比例示意图；形体练习为基础造型训练。"
-
-},
-
-{
-
-title:"第 3 课｜人体比例观察",
-
-goal:"掌握测量比例的方法，而不是背诵固定数字。",
-
-why:"人体比例会因年龄、体型、姿势、透视和艺术风格而变化。头身比只是观察工具，不是所有人物都必须符合的标准。",
-
-steps:[
-
-["第一步：确定总高度","以头部高度作为比较单位，估计人物整体高度。"],
-
-["第二步：标记关键位置","标记下巴、肩部、胸腔下缘、骨盆、膝盖和脚底。"],
-
-["第三步：比较宽度","观察肩宽、腰宽、骨盆宽度之间的关系。"],
-
-["第四步：比较左右差异","如果人物侧身或重心偏移，左右四肢长度和可见范围可能不同。"],
-
-["第五步：用辅助线检查","用水平线比较肩、肘、腕、膝等关键位置。"]
-
-],
-
-mistakes:["所有角色都套用同一个头身比。","忽略透视造成的近大远小。","用记忆画比例，不对照参考。"],
-
-exercise:"找一张全身站姿参考图，先测量头高，再标出全身关键点。画完后叠在参考图旁边比较。",
-
-check:["是否标记了关键关节？","肩宽和骨盆宽度是否接近参考？","是否考虑人物姿势和透视？","比例错误能否指出具体位置？"],
-
-reference:"https://commons.wikimedia.org/wiki/Special:FilePath/Proportions_of_the_head.jpg",
-
-source:"人体比例观察训练；参考图用于辅助比较，不作为唯一人体标准。"
-
-},
-
-{
-
-title:"第 4 课｜简单人物起稿",
-
-goal:"把观察、形体和比例整合成一个完整的简化人物。",
-
-why:"独立起稿的关键是先建立整体结构，再逐步细化。你不需要一开始就画出漂亮线稿。",
-
-steps:[
-
-["第一步：画动作线","用一条概括性曲线表示人物主要动作方向。"],
-
-["第二步：放置头部","用球体标记头部位置和朝向。"],
-
-["第三步：放置胸腔和骨盆","用两个简单体块表示躯干，注意两者的倾斜方向。"],
-
-["第四步：连接四肢","先用线标关节，再用圆柱体表示手臂和腿。"],
-
-["第五步：检查剪影","缩小画面，只看人物黑色剪影，检查动作是否清晰。"]
-
-],
-
-mistakes:["直接画衣服轮廓。","关节位置不明确。","胸腔和骨盆像一块平板。"],
-
-exercise:"独立画三个不同姿势的小人：站立、坐姿、抬手。每个只用 15 分钟，不画五官和服装细节。",
-
-check:["动作方向是否明确？","胸腔和骨盆是否分开？","肘、腕、膝、踝是否有位置？","剪影是否能读出姿势？"],
-
-reference:"https://commons.wikimedia.org/wiki/File:Andrew_Loomis,_Figure_Drawing_for_All_It%27s_Worth.pdf",
-
-source:"Andrew Loomis，《Figure Drawing for All It's Worth》，人物动态与结构概括参考。"
-
-},
-
-{
-
-title:"第 5 课｜动态线与重心",
-
-goal:"让人物姿势自然、有重量感，而不是像僵硬的木偶。",
-
-why:"人体动作依赖重心、支撑面和关节之间的关系。观察动作时，先找支撑脚和身体重量落点。",
-
-steps:[
-
-["第一步：找支撑点","观察人物由哪只脚、哪只手或哪个身体部位支撑重量。"],
-
-["第二步：找重心方向","观察胸腔、骨盆和支撑点之间的关系。"],
-
-["第三步：画动作线","用一条流畅线概括躯干动作，不要把脊柱画成僵硬直线。"],
-
-["第四步：观察反向倾斜","肩线和骨盆线常常存在方向差异，但不是每个动作都必须如此。"]
-
-],
-
-mistakes:["两条腿平均承重却没有依据。","支撑脚和骨盆位置不匹配。","只画外轮廓，不看动作方向。"],
-
-exercise:"临摹五个不同站姿动作，每个只画动作线、肩线、骨盆线和支撑脚。",
-
-check:["是否找到支撑点？","动作线是否流畅？","人物是否看起来有重量？"],
-
-reference:"https://commons.wikimedia.org/wiki/File:Andrew_Loomis,_Figure_Drawing_for_All_It%27s_Worth.pdf",
-
-source:"Andrew Loomis 人体动态造型训练参考。"
-
-},
-
-{
-
-title:"第 6 课｜胸腔与骨盆",
-
-goal:"理解躯干不是一整块，而是由不同方向的体块组成。",
-
-why:"胸腔和骨盆之间存在腰部连接。它们可以朝不同方向转动和倾斜，这也是人物扭转、弯腰和侧身的基础。",
-
-steps:[
-
-["第一步：画胸腔体块","先用椭圆或蛋形体概括胸腔。"],
-
-["第二步：画骨盆体块","用盒状体表示骨盆，标出正面和侧面。"],
-
-["第三步：连接腰部","用简单的收窄结构连接两块体积。"],
-
-["第四步：改变朝向","分别练习胸腔正面、侧面、俯视和仰视。"]
-
-],
-
-mistakes:["胸腔和骨盆完全平行。","腰部连接过长或过短。","体块没有明确朝向。"],
-
-exercise:"画 12 组胸腔与骨盆组合，分别改变倾斜和旋转方向。",
-
-check:["两块体积是否区分？","朝向是否明确？","腰部连接是否合理？"],
-
-reference:"https://openstax.org/books/anatomy-and-physiology/pages/7-1-divisions-of-the-skeletal-system",
-
-source:"OpenStax 骨骼结构资料用于理解人体支撑结构；艺术概括是绘画训练。"
-
-},
-
-{
-
-title:"第 7 课｜四肢与关节",
-
-goal:"理解手臂和腿的分段关系，避免肢体长度和连接错误。",
-
-why:"四肢不是随意延伸的线段。它们由不同骨段和关节连接，动作范围受到关节结构限制。",
-
-steps:[
-
-["第一步：定位关节","先标肩、肘、腕、髋、膝、踝。"],
-
-["第二步：连接骨段","上臂与前臂、大小腿分别作为独立段落。"],
-
-["第三步：添加体积","用圆柱和简化楔形概括肢体。"],
-
-["第四步：检查弯曲","观察肘膝弯曲方向以及关节连接是否自然。"]
-
-],
-
-mistakes:["肘膝位置随意。","前臂和上臂长度关系不合理。","关节连接像断开的木棍。"],
-
-exercise:"画正面、侧面、弯曲手臂和弯曲腿部结构，各三组。",
-
-check:["关节位置是否准确？","肢体分段是否清楚？","弯曲方向是否合理？"],
-
-reference:"https://openstax.org/books/anatomy-and-physiology/pages/7-1-divisions-of-the-skeletal-system",
-
-source:"OpenStax 骨骼系统图，用于辅助认识骨段和关节。"
-
-},
-
-{
-
-title:"第 8 课｜阶段测试",
-
-goal:"检验能否不依赖描摹完成简单人物结构起稿。",
-
-why:"阶段测试不以画得漂亮为标准，而是检查你是否真正理解整体、体块、比例和动态。",
-
-steps:[
-
-["第一步：独立观察","选择一张陌生全身人物参考图，观察 3 分钟。"],
-
-["第二步：独立起稿","用 25 分钟画出整体和主要体块。"],
-
-["第三步：对照检查","比较整体高度、肩线、骨盆、关节位置。"],
-
-["第四步：重画一次","针对最严重的三个错误重新画一遍。"]
-
-],
-
-mistakes:["只追求画面完成度。","不记录错误原因。","修改时只修局部，不检查整体。"],
-
-exercise:"完成一张站姿人物结构稿，并保留第一次和第二次版本。",
-
-check:["是否能独立起稿？","整体比例是否稳定？","人体体块是否有方向？","能否解释自己画错的原因？"],
-
-reference:"https://commons.wikimedia.org/wiki/File:Andrew_Loomis,_Figure_Drawing_for_All_It%27s_Worth.pdf",
-
-source:"Andrew Loomis 人体结构训练参考。"
-
-}
-
-];
-
-const weekNames=["造型基础","造型基础","造型基础","造型基础","人体结构","人体结构","人体结构","人体结构","头部与表情","头部与表情","头部与表情","头部与表情","细节整合","细节整合","细节整合","细节整合","风格训练","风格训练","风格训练","风格训练","原创创作","原创创作","原创创作","原创创作"];
-
-let completed=JSON.parse(localStorage.getItem("artist_done")||"[]");
+let done=JSON.parse(localStorage.getItem("artist_done")||"[]");
 
 let works=JSON.parse(localStorage.getItem("artist_works")||"[]");
 
 let records=JSON.parse(localStorage.getItem("artist_records")||"[]");
 
+let history=[];
+
+let selectedImage=null;
+
 let currentLesson=0;
+
+const lessons=[
+
+["第1课：观察人物整体","先找人物最高点、最低点、最左点和最右点。再标记头部、胸腔、骨盆和四肢方向。","找一张全身人物参考图，只画外框、头部、胸腔、骨盆和四肢方向，不画五官。"],
+
+["第2课：线条与几何体","练习直线、椭圆、盒子和圆柱。用几何体理解人物体积和朝向。","画20条直线、20个椭圆、10个盒子，最后用这些形体搭建一个站姿人物。"],
+
+["第3课：人体比例","用头高作为测量单位，比较肩宽、腰宽、骨盆宽度和关节位置。","找一张人物参考图，标记下巴、肩部、骨盆、膝盖和脚底。"],
+
+["第4课：人物起稿","先画动作线，再放头部、胸腔、骨盆，最后连接四肢。","独立画站立、坐姿、抬手三个简化人物。"],
+
+["第5课：动态与重心","观察支撑点、重心和动作线，让人物姿势自然。","画五个不同站姿，只画动作线、肩线、骨盆线和支撑脚。"],
+
+["第6课：胸腔与骨盆","胸腔和骨盆是两个不同体块，可以分别倾斜和旋转。","画12组胸腔与骨盆组合。"],
+
+["第7课：四肢关节","先标肩、肘、腕、髋、膝、踝，再连接各段肢体。","画正面、侧面、弯曲手臂和腿部结构。"],
+
+["第8课：阶段测试","选择陌生参考图，独立完成一张人物结构稿，再检查错误。","完成一张站姿人物结构稿，并保留修改前后版本。"]
+
+];
 
 function showPage(id){
 
-document.querySelectorAll("main section").forEach(s=>s.classList.add("hidden"));
+document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
 
-document.getElementById(id).classList.remove("hidden");
+document.getElementById(id).classList.add("active");
 
-document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
+document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x.dataset.page===id));
+
+if(id==="course")renderLessons();
 
 if(id==="works")renderWorks();
 
 if(id==="record")renderRecords();
-
-if(id==="course")renderLessons();
 
 window.scrollTo(0,0);
 
 }
 
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>showPage(b.dataset.page));
+
+function updateProgress(){
+
+document.getElementById("progressText").textContent=done.length+" / 24";
+
+}
+
+updateProgress();
 
 function renderLessons(){
 
@@ -628,9 +432,9 @@ lessons.forEach((l,i)=>{
 
 let b=document.createElement("button");
 
-b.className=i===currentLesson?"active":"";
+b.textContent=l[0];
 
-b.textContent=l.title;
+b.className=i===currentLesson?"active":"";
 
 b.onclick=()=>{currentLesson=i;renderLessons()};
 
@@ -640,135 +444,237 @@ menu.appendChild(b);
 
 let l=lessons[currentLesson];
 
-let html=`<div class="eyebrow">FOUNDATION · LESSON ${currentLesson+1}</div><h2>${l.title}</h2>
+document.getElementById("lessonContent").innerHTML=
 
-<h3>本课学习目标</h3><p>${l.goal}</p>
+`<h2>${l[0]}</h2><h3>老师讲解</h3><p>${l[1]}</p>
 
-<h3>先理解原理</h3><p>${l.why}</p>
+<div class="step"><b>本课练习</b><p>${l[2]}</p></div>
 
-<h3>老师带你一步一步画</h3>`;
+<div class="row">
 
-l.steps.forEach((s,i)=>html+=`<div class="step"><b>${s[0]}</b>${s[1]}</div>`);
+<button class="btn light" onclick="changeLesson(-1)">上一课</button>
 
-html+=`<h3>参考资料</h3><p>${l.source}</p><p><a href="${l.reference}" target="_blank">打开原始参考资料 ↗</a></p>
+<button class="btn" onclick="finishLesson()">完成本课</button>
 
-<h3>本课练习作业</h3><div class="step">${l.exercise}</div>
+<button class="btn light" onclick="changeLesson(1)">下一课</button>
 
-<h3>常见错误</h3><ul>${l.mistakes.map(x=>`<li>${x}</li>`).join("")}</ul>
+<button class="btn light" onclick="askAI()">让 AI 讲解</button>
 
-<h3>老师检查标准</h3>${l.check.map((x,i)=>`<div class="task"><label><input type="checkbox">${x}</label></div>`).join("")}
-
-<div class="row"><button class="btn light" onclick="changeLesson(-1)">上一课</button><button class="btn" onclick="finishLesson()">完成本课</button><button class="btn light" onclick="changeLesson(1)">下一课</button></div>`;
-
-document.getElementById("lessonBody").innerHTML=html;
+</div>`;
 
 }
-
-function openLesson(i){currentLesson=i;showPage("course")}
 
 function changeLesson(n){currentLesson=Math.max(0,Math.min(lessons.length-1,currentLesson+n));renderLessons()}
 
 function finishLesson(){
 
-if(!completed.includes(currentLesson)){completed.push(currentLesson);localStorage.setItem("artist_done",JSON.stringify(completed));}
+if(!done.includes(currentLesson))done.push(currentLesson);
 
-updateProgress();alert("已记录本课完成。建议保存一张练习作品，再进入下一课。");
+localStorage.setItem("artist_done",JSON.stringify(done));
 
-}
-
-function updateProgress(){
-
-document.getElementById("progressText").textContent=completed.length+" / 24";
-
-document.getElementById("progressBar").style.width=(completed.length/24*100)+"%";
+updateProgress();alert("课程进度已保存");
 
 }
+
+function askAI(){showPage("tutor");document.getElementById("question").value="请一步一步教我："+lessons[currentLesson][0]+"。我是初学者，请讲得具体一点。"}
 
 function makeTask(){
 
-let g=document.getElementById("gender").value,t=document.getElementById("topic").value,l=document.getElementById("level").value;
+let g=document.getElementById("gender").value;
 
-let tasks={
+let t=document.getElementById("topic").value;
 
-"人体比例":"画出人物头部、肩部、胸腔、骨盆、膝盖和脚底的关键位置，并标注比例关系。",
+let l=document.getElementById("level").value;
 
-"动态姿势":"观察人物的动作线、肩线、骨盆线和支撑点，完成三个不同姿势。",
+let tips={
 
-"头部结构":"用球体和侧面结构概括头部，练习正面、四分之三侧面和侧面。",
+"人体比例":"画出头、肩、胸腔、骨盆、膝盖和脚底的位置。",
 
-"五官定位":"先画头部中线和眼线，再定位眉、鼻、嘴，不要直接画细节。",
+"动态姿势":"画出动作线、肩线、骨盆线和支撑点。",
 
-"手部结构":"先把手掌概括为盒状体，再观察手指分组和关节方向。",
+"头部结构":"练习正面、四分之三侧面和侧面头部。",
 
-"服装褶皱":"先判断衣服受力点，再观察拉伸、挤压和悬垂形成的褶皱。"
+"五官定位":"先画头部中线和眼线，再定位五官。",
+
+"手部结构":"先把手掌概括成盒状体，再画手指。",
+
+"服装褶皱":"先判断衣服受力点，再画拉伸和挤压形成的褶皱。"
 
 };
 
-let result=`${g} · ${t} · ${l}难度\n\n作业：${tasks[t]}\n\n完成标准：至少完成两张练习；第一张分析结构，第二张独立重画；写下三个错误和改进方法。`;
+document.getElementById("taskResult").textContent=g+" · "+t+" · "+l+"难度\n\n"+tips[t];
 
-let el=document.getElementById("taskResult");el.textContent=result;el.classList.remove("hidden");
+}
+
+document.getElementById("imageInput").onchange=async e=>{
+
+let f=e.target.files[0];
+
+if(!f)return;
+
+if(f.size>5*1024*1024){alert("图片请压缩到5MB以内");return}
+
+if(!["image/jpeg","image/png","image/webp"].includes(f.type)){alert("只支持JPG、PNG、WEBP");return}
+
+let data=await new Promise((resolve,reject)=>{
+
+let r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(f);
+
+});
+
+selectedImage={mimeType:f.type,data:data.split(",")[1]};
+
+document.getElementById("preview").innerHTML='<img class="preview" src="'+data+'">';
+
+};
+
+function addBubble(text,type){
+
+let d=document.createElement("div");
+
+d.className="bubble "+type;
+
+d.textContent=text;
+
+document.getElementById("messages").appendChild(d);
+
+document.getElementById("messages").scrollTop=999999;
+
+}
+
+async function sendMessage(){
+
+let q=document.getElementById("question").value.trim();
+
+if(!q&&!selectedImage){alert("请先输入问题或上传图片");return}
+
+if(!API_URL){document.getElementById("status").textContent="请先填写并保存 Vercel 后端地址";return}
+
+addBubble(q||"请批改我的作品","user");
+
+document.getElementById("question").value="";
+
+document.getElementById("status").textContent="老师正在分析……";
+
+try{
+
+let response=await fetch(API_URL.replace(/\/$/,"")+"/api/mentor",{
+
+method:"POST",headers:{"Content-Type":"application/json"},
+
+body:JSON.stringify({message:q||"请分析我的人物绘画作品",history:history.slice(-8),image:selectedImage})
+
+});
+
+let data=await response.json();
+
+if(!response.ok)throw new Error(data.error||"请求失败");
+
+addBubble(data.reply,"ai");
+
+history.push({role:"user",text:q||"请批改作品"},{role:"assistant",text:data.reply});
+
+selectedImage=null;
+
+document.getElementById("imageInput").value="";
+
+document.getElementById("preview").innerHTML="";
+
+document.getElementById("status").textContent="分析完成";
+
+}catch(e){
+
+addBubble("连接失败："+e.message,"ai");
+
+document.getElementById("status").textContent="请检查后端部署和 API Key";
+
+}
+
+}
+
+function clearChat(){
+
+history=[];selectedImage=null;
+
+document.getElementById("messages").innerHTML='<div class="bubble ai">对话已清空。</div>';
+
+document.getElementById("preview").innerHTML="";
+
+document.getElementById("imageInput").value="";
+
+}
+
+function saveApiUrl(){
+
+let v=document.getElementById("apiUrl").value.trim().replace(/\/$/,"");
+
+if(v&&!/^https:\/\//i.test(v)){alert("地址必须以 https:// 开头");return}
+
+API_URL=v;localStorage.setItem("artist_api_url",v);alert("地址已保存");
 
 }
 
 function saveWork(){
 
-let file=document.getElementById("workFile").files[0];
+let f=document.getElementById("workFile").files[0];
 
-if(!file){alert("请先选择一张作品图片");return}
+if(!f){alert("请上传图片");return}
 
-if(file.size>1500000){alert("图片请压缩到 1.5MB 以内再上传");return}
+if(f.size>2*1024*1024){alert("图片请压缩到2MB以内");return}
 
-let reader=new FileReader();
+let r=new FileReader();
 
-reader.onload=()=>{
+r.onload=()=>{
 
-works.unshift({name:document.getElementById("workName").value||"未命名作品",topic:document.getElementById("workTopic").value,note:document.getElementById("workNote").value,image:reader.result,date:new Date().toLocaleDateString()});
+works.unshift({name:document.getElementById("workName").value,topic:document.getElementById("workTopic").value,note:document.getElementById("workNote").value,image:r.result,date:new Date().toLocaleDateString()});
 
 localStorage.setItem("artist_works",JSON.stringify(works));renderWorks();alert("作品已保存");
 
 };
 
-reader.readAsDataURL(file);
+r.readAsDataURL(f);
 
 }
 
 function renderWorks(){
 
-let el=document.getElementById("workList");
+document.getElementById("workList").innerHTML=works.map((w,i)=>
 
-el.innerHTML=works.map((w,i)=>`<div class="card"><img src="${w.image}"><h3>${escapeHTML(w.name)}</h3><p class="muted">${escapeHTML(w.topic)} · ${w.date}</p><p class="muted">${escapeHTML(w.note)}</p><button class="btn light small" onclick="deleteWork(${i})">删除</button></div>`).join("")||"<p class='muted'>还没有作品，上传第一张练习吧。</p>";
+`<div class="card"><img src="${w.image}"><h3>${safe(w.name)}</h3><p class="muted">${safe(w.topic)} · ${w.date}</p><p>${safe(w.note)}</p><button class="btn light" onclick="deleteWork(${i})">删除</button></div>`
+
+).join("")||"<p>还没有作品</p>";
 
 }
 
-function deleteWork(i){if(confirm("确定删除这张作品吗？")){works.splice(i,1);localStorage.setItem("artist_works",JSON.stringify(works));renderWorks()}}
+function deleteWork(i){if(confirm("确定删除吗？")){works.splice(i,1);localStorage.setItem("artist_works",JSON.stringify(works));renderWorks()}}
+
+function safe(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 
 function saveRecord(){
 
-records.unshift({date:new Date().toLocaleString(),learn:document.getElementById("recordLearn").value,problem:document.getElementById("recordProblem").value,next:document.getElementById("recordNext").value});
+records.unshift({date:new Date().toLocaleString(),learn:recordLearn.value,problem:recordProblem.value,next:recordNext.value});
 
-localStorage.setItem("artist_records",JSON.stringify(records));renderRecords();alert("学习记录已保存");
+localStorage.setItem("artist_records",JSON.stringify(records));renderRecords();alert("记录已保存");
 
 }
 
 function renderRecords(){
 
-document.getElementById("recordList").innerHTML=records.map(r=>`<div class="card"><div class="muted">${r.date}</div><p><b>学习内容：</b>${escapeHTML(r.learn)}</p><p><b>发现的问题：</b>${escapeHTML(r.problem)}</p><p><b>下次改进：</b>${escapeHTML(r.next)}</p></div>`).join("")||"<p class='muted'>暂时没有学习记录。</p>";
+document.getElementById("recordList").innerHTML=records.map(r=>
+
+`<div class="card"><p>${safe(r.date)}</p><p>学习：${safe(r.learn)}</p><p>问题：${safe(r.problem)}</p><p>改进：${safe(r.next)}</p></div>`
+
+).join("");
 
 }
-
-function escapeHTML(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 
 function exportData(){
 
-let data={completed,works,records};
+let blob=new Blob([JSON.stringify({done,works,records})],{type:"application/json"});
 
-let blob=new Blob([JSON.stringify(data)],{type:"application/json"});
-
-let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="artist-ai-backup.json";a.click();URL.revokeObjectURL(a.href);
+let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="artist-ai-backup.json";a.click();
 
 }
-
-updateProgress();
 
 renderLessons();
 
