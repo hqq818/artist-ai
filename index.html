@@ -1,0 +1,65 @@
+const express = require("express");
+const path = require("path");
+require("dotenv").config?.();
+
+const app = express();
+app.use(express.json({ limit: "12mb" }));
+app.use(express.static(path.join(__dirname, "public")));
+
+const API_KEY = process.env.AI_API_KEY || "";
+const BASE_URL = (process.env.AI_BASE_URL || "https://api.openai.com/v1").replace(/\/$/, "");
+const MODEL = process.env.AI_MODEL || "gpt-4.1-mini";
+
+app.get("/api/status", (_req, res) => {
+  res.json({ aiConfigured: Boolean(API_KEY), model: API_KEY ? MODEL : null });
+});
+
+app.post("/api/chat", async (req, res) => {
+  if (!API_KEY) return res.status(503).json({ error: "AI_NOT_CONFIGURED", message: "尚未配置 AI_API_KEY。课程、档案等本地功能仍可使用。" });
+  try {
+    const { messages = [], memory = "" } = req.body || {};
+    const system = `你是 ARTIST AI，一位严谨、温柔、科学的角色绘画导师。只教人物/角色绘画，男女角色训练同等重要，覆盖动漫、韩系、半写实、欧美等风格。用户目前可能会临摹但不擅长独立创作。回答要具体、可执行、分步骤；批改时区分观察到的事实与不确定推测，不要假装看到了未提供的图片。长期学习记录：${String(memory).slice(0,5000)}`;
+    const r = await fetch(`${BASE_URL}/chat/completions`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: MODEL, messages: [{ role: "system", content: system }, ...messages].slice(-24), temperature: 0.7 })
+    });
+    const data = await r.json();
+    if (!r.ok) return res.status(r.status).json({ error: "PROVIDER_ERROR", message: data.error?.message || "AI 服务请求失败" });
+    res.json({ reply: data.choices?.[0]?.message?.content || "暂时没有收到回复。" });
+  } catch (e) {
+    res.status(500).json({ error: "SERVER_ERROR", message: e.message });
+  }
+});
+
+app.post("/api/vision", async (req, res) => {
+  if (!API_KEY) return res.status(503).json({ error: "AI_NOT_CONFIGURED", message: "尚未配置 AI_API_KEY，暂时无法进行真正的视觉分析。" });
+  try {
+    const { image, prompt = "请分析这张人物绘画练习。" } = req.body || {};
+    if (!image || !/^data:image\/(png|jpeg|webp);base64,/.test(image)) {
+      return res.status(400).json({ error: "INVALID_IMAGE", message: "请上传 PNG、JPG 或 WEBP 图片。" });
+    }
+    const userPrompt = `${prompt}\n请按以下结构反馈：1.能从图中确认的优点；2.最重要的三个可改进点；3.具体修改方法；4.一个针对性练习。不要猜测图片中无法确认的内容。`;
+    const r = await fetch(`${BASE_URL}/chat/completions`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [
+          { role: "system", content: "你是专业人物绘画导师。只根据图像中实际可见内容进行分析，坦诚说明不确定之处，不要捏造细节。" },
+          { role: "user", content: [{ type: "text", text: userPrompt }, { type: "image_url", image_url: { url: image } }] }
+        ],
+        temperature: 0.4
+      })
+    });
+    const data = await r.json();
+    if (!r.ok) return res.status(r.status).json({ error: "PROVIDER_ERROR", message: data.error?.message || "视觉分析请求失败" });
+    res.json({ analysis: data.choices?.[0]?.message?.content || "暂时没有收到分析。" });
+  } catch (e) {
+    res.status(500).json({ error: "SERVER_ERROR", message: e.message });
+  }
+});
+
+app.get("*", (_req, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`ARTIST AI 4.0 running at http://localhost:${port}`));
